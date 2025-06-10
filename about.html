@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About Us - Our School</title>
+  <style>
+    /* CSS Reset and base */
+    :where(html, body) {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont,
+        "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+        sans-serif;
+      background-color: #ffffff;
+      color: #6b7280;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      scroll-behavior: smooth;
+      opacity: 0;
+    animation-name: fadeIn;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-delay: 1s;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+    /* Container */
+  .about-text p{
+    text-align: justify;
+    margin: 0px 30px;
+    font-size: 0.95rem;
+  }
+    .container {
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 1.25rem; /* 20px */
+      padding-right: 1.25rem;
+    }
+    /* Hero Section */
+    header.hero {
+      padding: 6rem 1.25rem 4rem;
+      text-align: center;
+      background: url('pgpc.jpg') no-repeat center center;
+      background-size: cover;
+      height: 50px;
+      color: #111827;
+    }
+    
+    /* Main Content */
+    main {
+      padding: 4rem 0 6rem;
+      color: #4b5563;
+      
+    }
+  main h1{
+    font-size: 30px;
+    margin-left: 30px;
+  }
+    section.about-text {
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 1.125rem;
+      line-height: 1.75;
+      margin-bottom: 4rem;
+    }
+    /* Features Grid */
+    section.features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+    .card {
+      background-color: #fff;
+      border-radius: 0.75rem;
+      padding: 2rem;
+      box-shadow: 0 2px 12px rgb(0 0 0 / 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover,
+    .card:focus-within {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgb(0 0 0 / 0.1);
+      outline: none;
+    }
+    .card h2 {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: #111827;
+      margin-bottom: 0.75rem;
+    }
+    .card p {
+      font-weight: 400;
+      line-height: 1.6;
+      font-size: 1rem;
+      color: #4b5563;
+    }
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 1.25rem;
+      font-size: 0.9rem;
+      color: #9ca3af;
+      border-top: 1px solid #e5e7eb;
+      user-select: none;
+    }
+    /* Responsive padding */
+    @media (min-width: 768px) {
+      
+      main {
+        padding-top: 6rem;
+      }
+      section.about-text {
+        font-size: 1.25rem;
+      }
+    }
+    /* Focus ring for keyboard navigation */
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid #6366f1;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+ 
+
+  <header class="hero" role="banner">
+    <div class="container">
+      </div>
+  </header>
+
+  <main>
+    <section class="about-text" id="about" tabindex="-1">
+      <h1>About Us</h1>
+      <p>
+        The Padre Garcia Polytechnic College shall primarily provide advanced education, higher technological, and professional instruction and training in the areas of sciences, arts, education, business, engineering, computing, health, governance, criminal justice, social services, and other related courses. It shall also undertake research, extension, administrative and production services, and provide progressive leadership in its areas of specialization. 
+
+The youth, especially the talented marginalized student populace, needs an educational institution that will provide quality education within the Municipality of Padre Garcia.
+      </p>
+    </section>
+
+    <section class="features container" aria-label="School core features">
+      <article class="card" tabindex="0" id="mission">
+        <h2>Our Mission</h2>
+        <p>
+          As a higher learning institution, PGPC is committed to produce globally competent professionals and leaders with industry- based knowledge, skills, and values that will enable them achieve their professional growth and total human development.
+        </p>
+      </article>
+      <article class="card" tabindex="0" id="vision">
+        <h2>Our Vision</h2>
+        <p>
+          PGPC is a premier higher learning institution producing globally competitive and excellent professionals and leaders instrumental to community development and nation-building.
+        </p>
+      </article>
+      <article class="card" tabindex="0" id="values">
+        <h2>Our Values</h2>
+        <p>
+          P - Professional Development<br>
+
+G - God-centered Community<br>
+
+P – Progressive Community<br>
+
+C - Commitment to Excellence
+        </p>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2025 PGPC. All rights reserved.
+  </footer>
+</body>
+</html>
+
