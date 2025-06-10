@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PGPC Online Enrollment - Modern UI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    /* Reset and base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Inter', 'IBM Plex Sans', sans-serif;
+      background-color: #ffffff;
+      color: #6b7280;
+      font-size: 18px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      scroll-behavior: smooth;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    a:focus-visible,
+    button:focus-visible {
+      outline-offset: 3px;
+      outline: 3px solid #2563eb;
+    }
+
+    /* Sticky Navigation Bar */
+    header {
+      position: sticky;
+      top: 0;
+      background:#111827;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      z-index: 1000;
+      user-select: none;
+      transition: box-shadow 0.3s ease;
+    }
+    header.scrolled {
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      font-weight: 800;
+      font-size: 1.75rem;
+      color: #fff;
+      letter-spacing: 0.05em;
+      user-select: none;
+      gap: 0.5rem;
+    }
+    .logo img {
+      height: 44px;
+      border-radius: 50px;
+      box-shadow: 0 0 10px #d4af37aa;
+      transition: transform 0.3s ease;
+    }
+    .logo img:hover {
+      transform: scale(1.05);
+    }
+
+    /* Navigation links container 
+       Desktop: horizontal flex
+       Mobile: vertical drawer hidden by default */
+    .nav-contents {
+      display: flex;
+      gap: 1.5rem;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #374151;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      transition: transform 0.3s ease;
+    }
+    .nav-contents li {
+      position: relative;
+    }
+    .nav-contents a {
+      display: block;
+      padding: 8px 14px;
+      border-radius: 0.75rem;
+      transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      user-select: none;
+      color: #fff;
+    }
+    .nav-contents a::after {
+      content: "";
+      position: absolute;
+      bottom: 6px;
+      left: 20%;
+      width: 60%;
+      height: 2.5px;
+      border-radius: 100vmax;
+      background: transparent;
+      transform-origin: center;
+      transition: background-color 0.3s ease;
+    }
+    .nav-contents a:hover,
+    .nav-contents a:focus {
+      background-color: #d4af37;
+      color: #111827;
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.5);
+      outline: none;
+    }
+    .nav-contents a:hover::after,
+    .nav-contents a:focus::after {
+      background-color: #ad8d13;
+    }
+
+    /* Menu toggle for mobile */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: #fff;
+      cursor: pointer;
+      padding: 4px;
+      user-select: none;
+      transition: color 0.3s ease;
+    }
+    .menu-toggle:hover,
+    .menu-toggle:focus {
+      color: #ffd533;
+      outline: none;
+    }
+
+    /* Mobile styles */
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+      .nav-contents {
+        flex-direction: column;
+        position: fixed;
+        top: 76px;
+        right: 0;
+        height: calc(100vh - 76px);
+        width: 230px;
+        background: #ffffff;
+        padding: 3rem 1.5rem;
+        box-shadow: -4px 0 30px rgb(0 0 0 / 0.1);
+        border-radius: 0 0 0 1rem;
+        /* Hide nav off canvas initially */
+        transform: translateX(100%);
+        visibility: hidden;
+        pointer-events: none;
+        z-index: 1200;
+      }
+      /* Show nav when .show */
+      .nav-contents.show {
+        transform: translateX(0);
+        visibility: visible;
+        pointer-events: auto;
+      }
+      /* Nav links color and style mobile */
+      .nav-contents a {
+        color: #111827;
+        font-size: 1.15rem;
+        font-weight: 600;
+        padding: 10px 12px;
+      }
+      .nav-contents a:hover,
+      .nav-contents a:focus {
+        color: #111827;
+        background-color: #fef3c7; /* soft gold */
+        border-radius: 0.5rem;
+        outline: none;
+      }
+    }
+
+    /* Hero Section */
+    .video-banner {
+      position: relative;
+      width: 100%;
+      max-width: 2000px;
+      overflow: hidden;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.08);
+      background: #fefefe;
+      margin-left: 0;
+      margin-right: 0;
+      
+    }
+    .video-banner video {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: auto;
+      height: 100%;
+      min-width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+      filter: none;
+      border-radius: 0.75rem;
+      transition: filter 0.3s ease;
+    }
+    .video-banner::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: transparent;
+      backdrop-filter: none;
+      border-radius: 0.75rem;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .banner-content {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 4rem 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      color: #111827;
+      user-select: none;
+      text-shadow: 0 2px 12px rgba(0 0 0 / 0.1);
+    }
+    .banner-content h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      line-height: 1.1;
+      color: #fff;
+      text-shadow: 0 2px 12px rgba(0 0 0 / 0.85);
+    }
+    
+    .banner-content p {
+      font-size: 1.15rem;
+      font-weight: 500;
+      margin-bottom: 3rem;
+      color: #fff;
+      user-select: none;
+      text-shadow: 0 2px 12px rgba(0 0 0 / 0.85);
+    }
+    
+    .banner-content button {
+      padding: 1rem 2.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      background-color: #ddd;
+      color: #111827;
+      border: none;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      margin-top: 90px;
+      box-shadow: 0 8px 20px rgb(212 175 55 / 0.35);
+      transition: background-color 0.3s ease, transform 0.25s ease, box-shadow 0.3s ease;
+      user-select: none;
+      letter-spacing: 0.05em;
+      font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+    .banner-content button:hover,
+    .banner-content button:focus-visible {
+      background-color: #b48a04;
+      box-shadow: 0 12px 30px rgb(180 138 4 / 0.6);
+      outline-offset: 3px;
+      outline: 3px solid #2563eb;
+      transform: scale(1.05);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .video-banner {
+        height: 500px;
+      }
+      .banner-content h1 {
+        font-size: 2.75rem;
+      }
+      .banner-content p {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+      }
+      .banner-content button {
+        font-size: 1rem;
+        padding: 0.75rem 2rem;
+      }
+      .banner-content {
+        padding: 3rem 2rem;
+        align-items: center;
+        text-align: center;
+      }
+    }
+    @media (max-width: 480px) {
+      .video-banner {
+        height: 600px;
+      }
+      .banner-content h1 {
+        font-size: 2rem;
+      }
+      .banner-content p {
+        font-size: 0.9rem;
+      }
+      .banner-content button {
+        width: 100%;
+      }
+    }
+
+    /* Sections Container */
+    .section {
+      padding: 5rem 2rem 6rem;
+      max-width: 1200px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+    }
+
+    /* Section titles */
+    .section h2 {
+      font-size: 2.875rem;
+      font-weight: 700;
+      color: #6b7280;
+      text-align: left;
+      letter-spacing: 0.07em;
+      margin-bottom: 1.5rem;
+      user-select: none;
+    }
+
+    /* Icon styling */
+    .icon {
+      display: flex;
+      justify-content: center;
+      user-select: none;
+      margin-top: -3rem;
+      margin-bottom: 2rem;
+    }
+    .icon img {
+      width: 70px;
+      height: auto;
+      filter: drop-shadow(0 1px 4px rgba(212,175,55,0.72));
+      user-select: none;
+      margin-top: 20px;
+    }
+
+    /* Courses horizontal scroll container */
+    .courses {
+      display: flex;
+      gap: 1.5rem;
+      overflow-x: auto;
+      padding: 1rem;
+      scrollbar-width: thin;
+      scroll-padding: 0 2rem;
+      scroll-snap-type: x mandatory;
+    }
+    .courses::-webkit-scrollbar {
+      height: 0px;
+    }
+    .courses::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .courses::-webkit-scrollbar-thumb {
+      background-color: #d4af37;
+      border-radius: 10px;
+    }
+
+    /* Course card */
+    .course {
+      flex: 0 0 280px;
+      background: #f9fafb;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px 0  rgba(0, 0, 0, 0.19);
+      padding: 2rem 1.8rem 2.5rem;
+      text-align: center;
+      scroll-snap-align: start;
+      color: #111827;
+      font-weight: 700;
+      font-size: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), box-shadow 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      will-change: transform;
+    }
+    .course::before {
+      content: "";
+      position: absolute;
+      top: 1.4rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 3rem;
+      height: 3rem;
+      background: url('images/book.png') no-repeat center;
+      background-size: contain;
+      opacity: 0.15;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      border-radius: 50%;
+    }
+    .course:hover,
+    .course:focus-visible {
+      transform: translateY(-10px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      outline: none;
+    }
+    .course:hover::before,
+    .course:focus-visible::before {
+      opacity: 0.3;
+    }
+
+    /* New Teachers Section Cards */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+      gap: 2rem;
+      color: #111827;
+      user-select: none;
+    }
+    .feature {
+      background: #ffffff;
+      padding: 2rem 2.2rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 28px rgb(212 175 55 / 0.15);
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: default;
+    }
+    .feature:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 22px 60px rgb(212 175 55 / 0.3);
+    }
+
+    /* Footer */
+    footer {
+      background: #111827;
+      color: #d4af37;
+      text-align: center;
+      padding: 3rem 1rem;
+      user-select: none;
+    }
+    footer a {
+      color: #facc15;
+      text-decoration: none;
+      margin: 0 0.5rem;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+    footer a:hover, footer a:focus {
+      color: #b45309;
+      outline: none;
+      text-decoration: underline;
+    }
+    footer h4 {
+      max-width: 700px;
+      margin: 1.5rem auto 2rem;
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #fbbf24;
+      font-style: italic;
+      letter-spacing: 0.05em;
+      user-select: none;
+    }
+    footer .icon img {
+      height: 70px;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 1px 3px #d4af37bb);
+      user-select: none;
+    }
+
+    /* Utility: Container for centering with max width */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      .banner {
+        padding: 3rem 3rem;
+        height: 480px;
+        border-radius: 0.75rem;
+      }
+      .banner h1 {
+        font-size: 3rem;
+      }
+      .banner p {
+        font-size: 1.1rem;
+      }
+      .cta-button, .start {
+        font-size: 1rem;
+        padding: 0.8rem 2rem;
+      }
+      .course {
+        flex: 0 0 230px;
+        font-size: 1.1rem;
+      }
+      .section h2 {
+        font-size: 2.2rem;
+      }
+    }
+    @media (max-width: 640px) {
+      .banner {
+        justify-content: center;
+        padding: 3rem 1.5rem;
+        height: 380px;
+        border-radius: 0.5rem;
+        text-align: center;
+      }
+      .banner-content {
+        max-width: 100%;
+      }
+      .banner h1 {
+        font-size: 2rem;
+      }
+      .banner p {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .cta-button, .start {
+        width: 100%;
+        margin: 0.4rem 0;
+      }
+      nav {
+        padding: 0 1rem;
+      }
+      .nav-contents {
+        gap: 1rem;
+      }
+      .nav-contents a {
+        padding: 10px 12px;
+      }
+    }
+
+    .haha{
+      font-size: 2.2rem;
+      margin-left: 30px;
+    }
+   .banner-content h1, .banner-content p {
+    opacity: 0;
+    animation-name: fadeIn;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-delay: 1s;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .read{
+    width: 120px;
+    height: 50px;
+    color: white;
+    background-color: #111827;
+    border-radius: 5px;
+    border: 0;
+  }
+  </style>
+</head>
+<body>
+
+<header id="header">
+  <nav class="container" aria-label="Primary navigation">
+    <a href="#banner" class="logo" aria-label="Go to homepage">
+      <img src="templates/pgpc.png" alt="PGPC Logo" />
+      PGPC
+    </a>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-contents" tabindex="0">&#9776;</button>
+    <ul class="nav-contents" id="nav-contents" role="menu" tabindex="-1">
+      <li role="none"><a href="#about" role="menuitem" tabindex="-1">About Us</a></li>
+      <li role="none"><a href="#courses" role="menuitem" tabindex="-1">Courses Offered</a></li>
+      <li role="none"><a href="#teachers" role="menuitem" tabindex="-1">See Teachers</a></li>
+      <li role="none"><a href="#apply" role="menuitem" tabindex="-1">How to Enroll</a></li>
+      <li role="none"><a href="#contact" role="menuitem" tabindex="-1">Contact Us</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section class="video-banner" role="banner" aria-label="Welcome to PGPC with video background" id="banner">
+    <video autoplay muted loop playsinline aria-hidden="true" tabindex="-1" >
+      <source src="templates/pgpc1.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+    <div class="banner-content">
+      <h1>Welcome to Padre Garcia Polytechnic College!</h1>
+      <p>Your future starts here. Explore and apply to become a PGPCian today.</p>
+      <button onclick="location.href='form1.html'" aria-label="Apply now to PGPC">Apply Now</button>
+    </div>
+</section>
+
+<main>
+
+<section class="section" id="about" tabindex="-1" aria-labelledby="about-title">
+  <div class="icon">
+    <img src="images/info.png" alt="" aria-hidden="true" />
+  </div>
+  <h2 id="about-title">About PGPC</h2>
+  <p style="color:#111827; max-width: 900px; margin-left: auto; margin-right: auto; font-weight: 500; font-size: 1.125rem;">
+    <strong>Padre Garcia Polytechnic College (PGPC)</strong> is a premier higher learning institution located in Padre Garcia, Batangas. Committed to accessible, quality education enabling young Garcianos to thrive in a modern, competitive world.
+  </p>
+  <button class="read" onclick="location.href='about.html'">Read More</button>
+</section>
+
+<section class="section" id="courses" tabindex="-1" aria-labelledby="courses-title">
+  <div class="icon">
+    <img src="images/book.png" alt="" aria-hidden="true" />
+  </div>
+  <h2 id="courses-title">Courses Offered</h2>
+  <div class="courses" tabindex="0" aria-label="Horizontal scroll list of courses offered">
+    <article class="course" tabindex="0" role="group" aria-labelledby="course1-title" aria-describedby="course1-desc">
+      <h3 id="course1-title"><div class="icon">
+    <img src="templates/cs.png" alt="" aria-hidden="true" />
+  </div>
+        BS Computer Science</h3>
+      <p id="course1-desc" style="font-weight: 400; font-size: 0.95rem; margin-top: 0.25rem; color: #374151;">
+        Explore programming, algorithms, and software development to build innovative tech solutions.
+      </p>
+    </article>
+    <article class="course" tabindex="0" role="group" aria-labelledby="course2-title" aria-describedby="course2-desc">
+      <h3 id="course2-title"><div class="icon">
+    <img src="templates/ma.png" alt="" aria-hidden="true" />
+  </div>
+        BS Management Accounting</h3>
+      <p id="course2-desc" style="font-weight: 400; font-size: 0.95rem; margin-top: 0.25rem; color: #374151;">
+        Learn financial management, cost control, and business analytics to guide organizational success.
+      </p>
+    </article>
+    <article class="course" tabindex="0" role="group" aria-labelledby="course3-title" aria-describedby="course3-desc">
+      <h3 id="course3-title"> <div class="icon">
+    <img src="templates/pa.png" alt="" aria-hidden="true" />
+  </div>BS Public Administration</h3>
+      <p id="course3-desc" style="font-weight: 400; font-size: 0.95rem; margin-top: 0.25rem; color: #374151;">
+        Dive into governance, policy-making, and public service leadership to shape communities.
+      </p>
+    </article>
+    <article class="course" tabindex="0" role="group" aria-labelledby="course4-title" aria-describedby="course4-desc">
+      <h3 id="course4-title"><div class="icon">
+    <img src="templates/crim.png" alt="" aria-hidden="true" />
+  </div>BS Criminology</h3>
+      <p id="course4-desc" style="font-weight: 400; font-size: 0.95rem; margin-top: 0.25rem; color: #374151;">
+        Study law enforcement, forensic science, and criminal behavior to contribute to public safety.
+      </p>
+    </article>
+  </div>
+</section>
+
+<section class="section" id="teachers" tabindex="-1" aria-labelledby="teachers-title">
+  <div class="icon">
+    <img src="images/teacher.png" alt="" aria-hidden="true" />
+  </div>
+  <h2 id="teachers-title">Meet Our Teachers</h2>
+  <div class="features" aria-label="Teachers' features">
+    <div class="feature" role="listitem">Experienced Faculty dedicated to student success</div>
+    <div class="feature" role="listitem">Dedicated Mentors with passion for teaching</div>
+    <div class="feature" role="listitem">Supportive Learning Environment fostering growth</div>
+    <div class="feature" role="listitem">Industry Professionals bridging theory and practice</div>
+  </div>
+</section>
+    
+    <h2 class="haha">News &amp; Announcements</h2>
+    <iframe id="hi" src="https://widgets.sociablekit.com/facebook-page-posts/iframe/25565889" frameborder="0" width="100%" height="900"></iframe>
+ 
+
+<section class="section" id="contact" tabindex="-1" aria-labelledby="contact-title">
+  
+<iframe 
+  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.472305226647!2d121.26432607510538!3d13.88280938726921!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd3f0024d47b1b%3A0x111daf1b2a29e55e!2sPadre%20Garcia%20Polytechnic%20College!5e0!3m2!1sen!2sph!4v1717995672387!5m2!1sen!2sph" 
+  width="100%" 
+  height="400" 
+  style="border:0;" 
+  allowfullscreen="" 
+  loading="lazy" 
+  referrerpolicy="no-referrer-when-downgrade">
+</iframe>
+</section>
+
+</main>
+
+<footer>
+  <div class="icon">
+    <img src="templates/fb.png" alt="FB" aria-hidden="true" />
+  </div>
+  <h4>"TAGA PGPC AKO: MATALINO, DISIPLINADO, MABUTING TAO, IPINAGMAMALAKI KO"</h4>
+  <p>&copy; 2025 Padre Garcia Polytechnic College | <a href="#" tabindex="0">Privacy Policy</a> | <a href="#" tabindex="0">Terms of Service</a></p>
+</footer>
+
+<script>
+  // Navigation menu toggle on mobile
+  const menuToggle = document.getElementById('menu-toggle');
+  const navContents = document.getElementById('nav-contents');
+
+  menuToggle.addEventListener('click', () => {
+    const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+    menuToggle.setAttribute('aria-expanded', String(!expanded));
+    navContents.classList.toggle('show');
+  });
+</script>
+</body>
+</html>
+
