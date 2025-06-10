@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PGPC Admission Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 20px;
+    }
+    .form-section {
+      background: #fff;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      border: 1px solid #ccc;
+    }
+    h2 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 5px;
+      margin-top: 5px;
+    }
+    .submit-btn {
+      margin-top: 20px;
+      background: #1877f2;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-section">
+    <h2>PGPC Admission Form</h2>
+    <form id="pgpcForm">
+      <label>Last Name: <input type="text" id="lastName" required></label>
+      <label>First Name: <input type="text" id="firstName" required></label>
+      <label>Middle Name: <input type="text" id="middleName"></label>
+      <label>Date of Birth: <input type="date" id="dob" required></label>
+      <label>Age: <input type="number" id="age" required></label>
+      <label>Place of Birth: <input type="text" id="placeOfBirth" required></label>
+      <label>Sex:
+        <select id="sex">
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </label>
+      <label>Mobile No.: <input type="text" id="mobile" required></label>
+      <label>Email Address: <input type="email" id="email" required></label>
+
+      <button class="submit-btn" type="submit">Next</button>
+    </form>
+  </div>
+  
+
+  <script>
+    document.getElementById("pgpcForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const data = {
+        lastName: document.getElementById("lastName").value,
+        firstName: document.getElementById("firstName").value,
+        middleName: document.getElementById("middleName").value,
+        dob: document.getElementById("dob").value,
+        age: document.getElementById("age").value,
+        placeOfBirth: document.getElementById("placeOfBirth").value,
+        sex: document.getElementById("sex").value,
+        mobile: document.getElementById("mobile").value,
+        email: document.getElementById("email").value
+      };
+      localStorage.setItem("pgpcData", JSON.stringify(data));
+      window.location.href = "summary1.html";
+    });
+  </script>
+</body>
+</html>
