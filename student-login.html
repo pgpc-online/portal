@@ -28,6 +28,16 @@
       max-width: 400px;
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      animation-name: fadeIn;
+      animation-duration: 1s;
+      animation-fill-mode: forwards;
+      animation-delay: 1s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .card h2 {
