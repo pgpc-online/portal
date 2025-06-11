@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,31 +8,117 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <style>
-    body { font-family: Arial; padding: 20px; max-width: 600px; margin: auto; font-size: 20px;}
-    input, label, button { display: block; margin-top: 10px; width: 100%; }
-    button { padding: 10px; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom right, #e0f7fa, #fce4ec);
+      color: #333;
+      line-height: 1.6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    form {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      width: 100%;
+    }
+
+    h2 {
+      text-align: center;
+      color: #00796b;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #555;
+      margin-top: -10px;
+      text-align: center;
+    }
+
+    ul {
+      font-size: 15px;
+      color: green;
+      margin-top: 10px;
+      padding-left: 20px;
+    }
+
+    label {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    input[type="file"] {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      background-color: #00796b;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #004d40;
+      transform: translateY(-2px);
+    }
+
+    #uploadingMessage {
+      display: none;
+      background: #E3F2FD;
+      color: #4070F4;
+      padding: 15px;
+      border: 1px solid #ffeeba;
+      border-radius: 5px;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      form {
+        padding: 20px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      button {
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
-  
+
 <form id="uploadForm">
-  
-<h2>Upload Student Requirements</h2>
-<p style="font-size: 16px; color: #555; margin-top: -10px;">
-  Please upload the necessary documents to complete your application.
-</p>
+  <h2>Upload Student Requirements</h2>
+  <p>Please upload the necessary documents to complete your application.</p>
 
-  <ul style="font-size: 15px; color: green; margin-top: 10px;">
-  <li>Make sure your 2x2 photo is clear and recent.</li>
-  <li>PSA Birth Certificate must be official and readable.</li>
-  <li>Good Moral Certificate is optional but recommended.</li>
+  <ul>
+    <li>Make sure your 2x2 photo is clear and recent.</li>
+    <li>PSA Birth Certificate must be official and readable.</li>
+    <li>Good Moral Certificate is optional but recommended.</li>
   </ul>
-  
-  <!--<label>Full Name:</label>
-  <input type="text" id="fullname" required>
-
-  <label>Email:</label>
-  <input type="email" id="email" required> -->
 
   <label>2x2 Photo (JPG/PNG):</label>
   <input type="file" id="photo" accept="image/*" required>
@@ -44,9 +130,9 @@
   <input type="file" id="goodmoral" accept=".pdf,image/*">
 
   <button type="submit">Submit</button>
-  
-  <div id="uploadingMessage" style="display:none; background: #E3F2FD; color: #4070F4; padding: 15px; border: 1px solid #ffeeba; border-radius: 5px; margin-top: 20px;">
-  Uploading... This may take a few moments. Please wait.
+
+  <div id="uploadingMessage">
+    Uploading... This may take a few moments. Please wait.
   </div>
 </form>
 
