@@ -296,8 +296,10 @@
         font-size: 2.75rem;
       }
       .banner-content p {
-        font-size: 1rem;
+        font-size: 1.5rem;
         margin-bottom: 2rem;
+        font-weight: 500;
+        text-shadow: 0 2px 12px rgba(0 0 0 / 0.85);
       }
       .banner-content button {
         font-size: 1rem;
@@ -428,30 +430,7 @@
       opacity: 0.3;
     }
 
-    /* New Teachers Section Cards */
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
-      gap: 2rem;
-      color: #111827;
-      user-select: none;
-    }
-    .feature {
-      background: #ffffff;
-      padding: 2rem 2.2rem;
-      border-radius: 1rem;
-      box-shadow: 0 10px 28px rgb(212 175 55 / 0.15);
-      font-weight: 600;
-      font-size: 1.1rem;
-      text-align: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      cursor: default;
-    }
-    .feature:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 22px 60px rgb(212 175 55 / 0.3);
-    }
-
+    
     /* Footer */
     footer {
       background: #111827;
@@ -601,13 +580,13 @@
 
 <section class="video-banner" role="banner" aria-label="Welcome to PGPC with video background" id="banner">
     <video autoplay muted loop playsinline aria-hidden="true" tabindex="-1" >
-      <source src="pgpc1.mp4" type="video/mp4" />
+      <source src="template/pgpc1.mp4" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
     <div class="banner-content">
       <h1>Welcome to Padre Garcia Polytechnic College!</h1>
-      <p>Your future starts here. Explore and apply to become a PGPCian today.</p>
-      <button onclick="location.href='form1.html'" aria-label="Apply now to PGPC">Apply Now</button>
+      <p>Matalino. Disiplinado. Mabuting tao. Ipinagmamalaki ko!</p>
+      <button onclick="location.href='student-login.html'" aria-label="Apply now to PGPC">Apply Now</button>
     </div>
 </section>
 
@@ -651,7 +630,7 @@
     <article class="course" tabindex="0" role="group" aria-labelledby="course3-title" aria-describedby="course3-desc">
       <h3 id="course3-title"> <div class="icon">
     <img src="template/pa.png" alt="" aria-hidden="true" />
-  </div>BS Public Administration</h3>
+  </div>B Public Administration</h3>
       <p id="course3-desc" style="font-weight: 400; font-size: 0.95rem; margin-top: 0.25rem; color: #374151;">
         Dive into governance, policy-making, and public service leadership to shape communities.
       </p>
@@ -667,20 +646,9 @@
   </div>
 </section>
 
-<section class="section" id="teachers" tabindex="-1" aria-labelledby="teachers-title">
-  <div class="icon">
-    <img src="images/teacher.png" alt="" aria-hidden="true" />
-  </div>
-  <h2 id="teachers-title">Meet Our Teachers</h2>
-  <div class="features" aria-label="Teachers' features">
-    <div class="feature" role="listitem">Experienced Faculty dedicated to student success</div>
-    <div class="feature" role="listitem">Dedicated Mentors with passion for teaching</div>
-    <div class="feature" role="listitem">Supportive Learning Environment fostering growth</div>
-    <div class="feature" role="listitem">Industry Professionals bridging theory and practice</div>
-  </div>
-</section>
+
     
-    <h2 class="haha">News &amp; Announcements</h2>
+    <h2 class="haha">News </h2>
     <iframe id="hi" src="https://widgets.sociablekit.com/facebook-page-posts/iframe/25565889" frameborder="0" width="100%" height="900"></iframe>
  
 
