@@ -17,7 +17,7 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      padding: 20px;
+      padding: 10px;
     }
 
     form {
@@ -25,7 +25,7 @@
       padding: 30px;
       border-radius: 10px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      max-width: 600px;
+      max-width: 1200px;
       width: 100%;
     }
 
@@ -52,15 +52,22 @@
     label {
       margin-top: 20px;
       font-weight: bold;
+      display: block; /* Ensures labels are block elements */
     }
 
-    input[type="file"] {
+    input[type="file"], input[type="radio"] {
       margin-top: 10px;
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 5px;
       width: 100%;
       font-size: 16px;
+    }
+
+    .radio-group {
+      margin-top: 10px;
+      display: flex;
+     /* flex-direction: column;  Stack radio buttons vertically */
     }
 
     button {
@@ -93,6 +100,10 @@
       text-align: center;
     }
 
+    .conditional-upload {
+      display: none; /* Hidden by default */
+    }
+
     @media (max-width: 480px) {
       form {
         padding: 20px;
@@ -119,6 +130,18 @@
     <li>PSA Birth Certificate must be official and readable.</li>
     <li>Good Moral Certificate is optional but recommended.</li>
   </ul>
+
+  <label>Garciano?</label>
+  <div class="radio-group">
+    <label><input type="radio" name="isGarciano" value="yes" onclick="toggleBarangayUpload()"> Yes</label>
+    <label><input type="radio" name="isGarciano" value="no" onclick="toggleBarangayUpload()"> No</label>
+  </div>
+  <hr>
+ 
+  <div class="conditional-upload" id="barangayUpload">
+    <label>Barangay Residency Document (PDF or Image):</label>
+    <input type="file" id="brgyPhoto" accept=".pdf,image/*">
+  </div>
 
   <label>2x2 Photo (JPG/PNG):</label>
   <input type="file" id="photo" accept="image/*" required>
@@ -161,6 +184,7 @@
       const photo = document.getElementById("photo").files[0];
       const psa = document.getElementById("psa").files[0];
       const goodmoral = document.getElementById("goodmoral").files[0];
+      const brgyPhoto = document.getElementById("brgyPhoto").files[0];
 
       const uploadFile = async (file, folder) => {
         const ref = storage.ref(`${folder}/${Date.now()}_${file.name}`);
@@ -171,6 +195,7 @@
       const photoURL = await uploadFile(photo, 'photos');
       const psaURL = await uploadFile(psa, 'psa');
       const goodMoralURL = goodmoral ? await uploadFile(goodmoral, 'goodmoral') : null;
+      const brgyPhotoURL = brgyPhoto ? await uploadFile(brgyPhoto, 'barangay') : null;
 
       // 2. Collect ALL localStorage values into one object
       const form1and2Data = {};
@@ -185,6 +210,8 @@
         photoURL,
         psaURL,
         goodMoralURL,
+        brgyPhotoURL,
+        isGarciano: document.querySelector('input[name="isGarciano"]:checked').value,
         submittedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
@@ -201,6 +228,12 @@
       alert("Something went wrong. Please try again.");
     }
   });
+
+  function toggleBarangayUpload() {
+    const barangayUpload = document.getElementById("barangayUpload");
+    const isGarciano = document.querySelector('input[name="isGarciano"]:checked');
+    barangayUpload.style.display = isGarciano && isGarciano.value === "yes" ? "block" : "none";
+  }
 </script>
 </body>
 </html>
