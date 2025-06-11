@@ -18,23 +18,23 @@
       -moz-osx-font-smoothing: grayscale;
       scroll-behavior: smooth;
       opacity: 0;
-    animation-name: fadeIn;
-    animation-duration: 1s;
-    animation-fill-mode: forwards;
-    animation-delay: 1s;
-  }
+      animation-name: fadeIn;
+      animation-duration: 1s;
+      animation-fill-mode: forwards;
+      animation-delay: 1s;
+    }
 
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
     /* Container */
-  .about-text p{
-    text-align: justify;
-    margin: 0px 30px;
-    font-size: 0.95rem;
-  }
+    .about-text p {
+      text-align: justify;
+      margin: 0px 30px;
+      font-size: 0.95rem;
+    }
     .container {
       max-width: 1200px;
       margin-left: auto;
@@ -46,22 +46,22 @@
     header.hero {
       padding: 6rem 1.25rem 4rem;
       text-align: center;
-      background: url('pgpc.jpg') no-repeat center center;
+      background: url('templates/back.jpg') no-repeat center center;
       background-size: cover;
-      height: 50px;
+      height: 90px;
       color: #111827;
+      transition: height 0.3s ease;
     }
     
     /* Main Content */
     main {
       padding: 4rem 0 6rem;
       color: #4b5563;
-      
     }
-  main h1{
-    font-size: 30px;
-    margin-left: 30px;
-  }
+    main h1 {
+      font-size: 30px;
+      margin-left: 30px;
+    }
     section.about-text {
       max-width: 800px;
       margin-left: auto;
@@ -112,7 +112,6 @@
     }
     /* Responsive padding */
     @media (min-width: 768px) {
-      
       main {
         padding-top: 6rem;
       }
@@ -129,46 +128,39 @@
   </style>
 </head>
 <body>
- 
-
   <header class="hero" role="banner">
     <div class="container">
-      </div>
+      <!--<h1>Welcome to Our School</h1>
+   --> </div>
   </header>
 
   <main>
     <section class="about-text" id="about" tabindex="-1">
       <h1>About Us</h1>
       <p>
-        The Padre Garcia Polytechnic College shall primarily provide advanced education, higher technological, and professional instruction and training in the areas of sciences, arts, education, business, engineering, computing, health, governance, criminal justice, social services, and other related courses. It shall also undertake research, extension, administrative and production services, and provide progressive leadership in its areas of specialization. 
-
-The youth, especially the talented marginalized student populace, needs an educational institution that will provide quality education within the Municipality of Padre Garcia.
-      </p>
+        Inspired by the aspirations and dreams of the youth from Padre Garcia through our visionary leaders: former Congressman and Municipal Mayor Hon. Michael Angelo C. Rivera, incumbent Municipal Mayor Hon. Mayor Celsa B. Rivera, and Municipal Mayor Hon. Vice Mayor Micko Angelo B. Rivera, they took a strong leadership to established the Padre Garcia Polytechnic College (PGPC). Their immeasurable love to serve the disadvantaged sectors of Padre Garcia was enshrined through the Municipal Ordinance No. 42 2023 entitled: ORDINANCE ESTABLISHING THE PADRE GARCIA POLYTECHNIC COLLEGE AND FOR OTHER PURPOSES. The institution served as the strong arm of the Local Government of Padre Garcia to provide globally competitive and high quality education through PGPC academic programs within the reach of the people.  </p>
     </section>
 
     <section class="features container" aria-label="School core features">
       <article class="card" tabindex="0" id="mission">
         <h2>Our Mission</h2>
         <p>
-          As a higher learning institution, PGPC is committed to produce globally competent professionals and leaders with industry- based knowledge, skills, and values that will enable them achieve their professional growth and total human development.
+          As a higher learning institution in REGION IV, PGPC is committed to produce globally competitive professionals and leaders with industry based knowledge,skills and values that will enable them achieve their professional growth and total human development.
         </p>
       </article>
       <article class="card" tabindex="0" id="vision">
         <h2>Our Vision</h2>
         <p>
-          PGPC is a premier higher learning institution producing globally competitive and excellent professionals and leaders instrumental to community development and nation-building.
+          PGPC is a premiere LOCAL higher learning institution in REGION IV producing globally competitive and excellent professionals and leaders instrumental to community development and nation building.
         </p>
       </article>
       <article class="card" tabindex="0" id="values">
         <h2>Our Values</h2>
         <p>
           P - Professional Development<br>
-
-G - God-centered Community<br>
-
-P – Progressive Community<br>
-
-C - Commitment to Excellence
+          G - God-centered Community<br>
+          P – Progressive Community<br>
+          C - Commitment to Excellence
         </p>
       </article>
     </section>
@@ -177,6 +169,19 @@ C - Commitment to Excellence
   <footer>
     &copy; 2025 PGPC. All rights reserved.
   </footer>
+
+  <script>
+    window.addEventListener('scroll', function() {
+      const hero = document.querySelector('.hero');
+      const scrollPosition = window.scrollY;
+
+      // Adjust the height of the hero section based on scroll position
+      if (scrollPosition < 100) {
+        hero.style.height = `${90 - scrollPosition}px`;
+      } else {
+        hero.style.height = '0px';
+      }
+    });
+  </script>
 </body>
 </html>
-
