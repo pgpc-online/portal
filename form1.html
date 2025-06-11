@@ -195,40 +195,43 @@
 
 <script>
   function saveData(event) {
-    event.preventDefault();
-    
-    // Clear previous error messages
-    document.getElementById("mobileError").style.display = "none";
-    document.getElementById("emailError").style.display = "none";
+  event.preventDefault();
 
-    const mobileNumber = document.getElementById("studentNumber").value;
-    const email = document.getElementById("studentEmail").value;
+  // Clear previous error messages
+  document.getElementById("mobileError").style.display = "none";
+  document.getElementById("emailError").style.display = "none";
 
-    // Validate mobile number (11 digits)
-    if (!/^\d{11}$/.test(mobileNumber)) {
-      document.getElementById("mobileError").style.display = "block";
-      return false; // Prevent form submission
-    }
+  const mobileNumber = document.getElementById("studentNumber").value;
+  const email = document.getElementById("studentEmail").value;
 
-    // Validate email (must contain '@')
-    if (!email.includes('@')) {
-      document.getElementById("emailError").style.display = "block";
-      return false; // Prevent form submission
-    }
+  // Validate mobile number (11 digits)
+  if (!/^\d{11}$/.test(mobileNumber)) {
+    document.getElementById("mobileError").style.display = "block";
+    return false;
+  }
 
-    // If validations pass, save data to       const firstNameInput = document.getElementById("firstName").value;
+  // Validate email (must contain '@')
+  if (!email.includes('@')) {
+    document.getElementById("emailError").style.display = "block";
+    return false;
+  }
+
+  // If validations pass, save data to localStorage
+  const firstNameInput = document.getElementById("firstName").value;
   const lastNameInput = document.getElementById("lastName").value;
   localStorage.setItem("firstName", firstNameInput);
   localStorage.setItem("lastName", lastNameInput);
+
   const form = document.getElementById('form1');
   const formData = new FormData(form);
 
   const form1Data = {};
   formData.forEach((value, key) => {
     form1Data[key] = value;
-    localStorage.setItem(key, value); // Store directly
+    localStorage.setItem(key, value); // Store each field
   });
 
+  // Redirect to form2.html
   window.location.href = "form2.html";
 }
 </script>
