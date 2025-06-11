@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <title>Application Form Part 2</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: #f2f2f2;
+      font-size: 16px;
+    }
+    .container {
+      background: #fff;
+      padding: 30px;
+      max-width: 700px;
+      margin: 20px auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    h3 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    label {
+      margin-top: 15px;
+      display: block;
+      font-weight: bold;
+      color: #555;
+    }
+    input[type="text"],
+    input[type="tel"],
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .radio-group {
+      margin-top: 10px;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      font-weight: normal;
+      margin-bottom: 10px;
+    }
+    .radio-group input[type="radio"] {
+      margin-right: 10px;
+    }
+    .buttonContainer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 25px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h3>II. FAMILY BACKGROUND</h3>
+    <form id="form2" action="consent.html" onsubmit="saveForm2Data(event)">
+      <label for="fatherName">Father's Name:</label>
+      <input type="text" name="fatherName" id="fatherName" required />
+
+      <label for="fatherOccupation">Occupation:</label>
+      <input type="text" name="fatherOccupation" id="fatherOccupation" required />
+
+      <label for="fatherNumber">Contact No./s:</label>
+      <input type="tel" name="fatherNumber" id="fatherNumber" pattern="[0-9]{10,15}" required />
+
+      <label for="motherName">Mother's Maiden Name:</label>
+      <input type="text" name="motherName" id="motherName" required />
+
+      <label for="motherOccupation">Occupation:</label>
+      <input type="text" name="motherOccupation" id="motherOccupation" required />
+
+      <label for="motherNumber">Contact No./s:</label>
+      <input type="tel" name="motherNumber" id="motherNumber" pattern="[0-9]{10,15}" required />
+
+      <label for="guardianName">Guardian's Name:</label>
+      <input type="text" name="guardianName" id="guardianName" required />
+
+      <label for="guardianOccupation">Guardian's Occupation:</label>
+      <input type="text" name="guardianOccupation" id="guardianOccupation" required />
+
+      <label for="guardianNumber">Contact No./s:</label>
+      <input type="tel" name="guardianNumber" id="guardianNumber" pattern="[0-9]{10,15}" required />
+
+      <label>Average Family Income:</label>
+        <div class="radio-group">
+        <label><input type="radio" name="familyIncome" value="below10k" required /> 10,000 and below</label>
+        <label><input type="radio" name="familyIncome" value="10kto20k" /> 10,001 - 20,000</label>
+        <label><input type="radio" name="familyIncome" value="20kto30k" /> 20,001 - 30,000</label>
+        <label><input type="radio" name="familyIncome" value="30kto40k" /> 30, 001 – 40,000</label>
+        <label><input type="radio" name="familyIncome" value="40kto50k" /> 40, 001 – 50,000</label>
+        <label><input type="radio" name="familyIncome" value="50kto100k" /> 50, 001 – 100,000</label>
+        <label><input type="radio" name="familyIncome" value="100kAbove" /> 100, 001 – Above</label>
+      </div>
+
+<div class="newDiv" style="margin-top: 80px;">
+  
+  <h3 style="margin-bottom: 20px;">III. EDUCATIONAL BACKGROUND</h3>
+  
+        <label for="strand">Senior High School strand:</label>
+      <input type="text" name="strand" id="strand" required />
+      
+       <label for="sname">SHS name:</label>
+      <input type="text" name="sname" id="sname" required />
+      
+      <label for="saddress">Address <i>(Brgy. City, Town)</i>:</label>
+      <input type="text" name="saddress" id="saddress" required />
+      
+     <label for="inclusiveDates">School Year:</label>
+   <!-- <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 30px;">
+  <input type="date" name="startDate" id="startDate" style="height: 35px;" required>
+  <span> – </span>
+  <input type="date" name="endDate" id="endDate" style="height: 35px;" required>
+  </div>-->
+ <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+  <input type="number" name="startDate" id="startDate" min="1900" max="2099" style="height: 35px;" required>
+  <span> – </span>
+  <input type="number" name="endDate" id="endDate" min="1900" max="2099" style="height: 35px;" required>
+  </div>
+<hr>
+      
+  <div class="College" style="margin-top: 50px;">
+  <label for="college">College(if any)/ALS GRADUATE:</label>
+  <i style="font-size: 15px;">*Leave blank if not applicable </i>
+      <input type="text" name="college" id="college" />
+      
+       <label for="cname">School name:</label>
+      <input type="text" name="cname" id="cname"/>
+      
+      <label for="caddress">Address <i>(Brgy. City, Town)</i>:</label>
+      <input type="text" name="caddress" id="caddress" />
+      <label for="cinclusiveDates">School Year:</label>
+   <div style="display: flex; gap: 10px; align-items: center;">
+  <input type="number" name="cstartDate" id="cstartDate" min="1900" max="2099" style="height: 35px;">
+  <span> – </span>
+  <input type="number" name="cendDate" id="cendDate" min="1900" max="2099" style="height: 35px;">
+      </div>
+ <label for="cprogram">Program</label>
+<input type="text" name="cprogram" id="cprogram" />
+
+    <hr>
+    <label>Member of Cultural Minority Group?</label>
+  <div class="radio-group">
+        <label><input type="radio" name="member" value="yes" required /> Yes</label>
+        <label><input type="radio" name="member" value="no" /> No</label>
+  </div>
+    <label>Do you have any physical disability or condition that requires special attention?</label>
+  <div class="radio-group">
+        <label><input type="radio" name="special" value="yes" required /> Yes</label>
+        <label><input type="radio" name="special" value="no" /> No</label>
+  </div>
+</div>
+      <div class="buttonContainer">
+        <button type="button" onclick="history.back()">Back</button>
+        <button type="submit" formaction="consent.html">Next</button>
+      </div>
+    </form>
+    <script>
+      
+  /* function saveForm2Data(event) {
+  event.preventDefault(); // Prevent auto-submit
+
+  localStorage.setItem('fatherName', document.getElementById('fatherName').value);
+  localStorage.setItem('fatherOccupation', document.getElementById('fatherOccupation').value);
+  localStorage.setItem('fatherNumber', document.getElementById('fatherNumber').value);
+
+  localStorage.setItem('motherName', document.getElementById('motherName').value);
+  localStorage.setItem('motherOccupation', document.getElementById('motherOccupation').value);
+  localStorage.setItem('motherNumber', document.getElementById('motherNumber').value);
+
+  localStorage.setItem('guardianName', document.getElementById('guardianName').value);
+  localStorage.setItem('guardianOccupation', document.getElementById('guardianOccupation').value);
+  localStorage.setItem('guardianNumber', document.getElementById('guardianNumber').value);
+
+  const income = document.querySelector('input[name="familyIncome"]:checked');
+  localStorage.setItem('familyIncome', income ? income.value : '');
+
+  localStorage.setItem('strand', document.getElementById('strand').value);
+  localStorage.setItem('sname', document.getElementById('sname').value);
+  localStorage.setItem('saddress', document.getElementById('saddress').value);
+  localStorage.setItem('startDate', document.getElementById('startDate').value);
+  localStorage.setItem('endDate', document.getElementById('endDate').value);
+
+  localStorage.setItem('college', document.getElementById('college').value);
+  localStorage.setItem('cname', document.getElementById('cname').value);
+  localStorage.setItem('caddress', document.getElementById('caddress').value);
+  localStorage.setItem('cstartDate', document.getElementById('cstartDate').value);
+  localStorage.setItem('cendDate', document.getElementById('cendDate').value);
+  localStorage.setItem('cprogram', document.getElementById('cprogram').value);
+
+  const member = document.querySelector('input[name="member"]:checked');
+  localStorage.setItem('member', member ? member.value : '');
+
+  const special = document.querySelector('input[name="special"]:checked');
+  localStorage.setItem('special', special ? special.value : '');
+
+  // Submit after saving
+  document.getElementById("form2").submit();
+}*/
+      function saveForm2Data(event) {
+  event.preventDefault();
+
+  const form = document.getElementById('form2');
+  const formData = new FormData(form);
+
+  const form2Data = {};
+  formData.forEach((value, key) => {
+    form2Data[key] = value;
+  });
+
+  for (const key in form2Data) {
+    localStorage.setItem(key, form2Data[key]);
+  }
+
+  form.submit();
+      }
+    </script>
+  </div>
+</body>
+</html>

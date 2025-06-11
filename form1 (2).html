@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <title>Student Personal Information</title>
+  <style>
+      * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0px;
+      font-size: 16px;
+    }
+    /*NAVIGATIONNNNN BARRRRRR*/
+    .nav1{
+     background: #003366;
+     padding-bottom: 10px;
+     padding-left: 10px;
+     position: fixed;
+     top: 0;
+     width: 100%;
+     height: 70px;
+     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+  
+    .container {
+      background: #fff;
+      padding: 30px;
+      max-width: 500px;
+      margin: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      height: auto;
+    }
+
+    h3 {
+      margin-top: 0;
+      color: #333;
+      text-align: center;
+    }
+
+    label {
+      margin-top: 15px;
+      display: block;
+      font-weight: bold;
+      color: #555;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    .buttonContainer {
+  display: flex;
+  justify-content: flex-end; /* Aligns button to the right */
+  margin-top: 25px;
+}
+button {
+  padding: 10px 20px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+  width: auto;
+}
+button:hover {
+  background: #0056b3;
+}
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+    }
+    input, select {
+  font-size: 16px; /* Prevent iOS zooming issue */
+    }
+    .container{
+      margin-top: 120px;
+      width: 100%;
+      max-width: 700px;
+    }
+    /* p under header*/
+    .message{
+      margin: 20px;
+      margin-top: 120px;
+      line-height: 1.3;
+      text-align: justify;
+    }
+  .subText{margin-top: 20px; margin-bottom: 20px;}
+  
+  .back-arrow {
+  width: 50px;
+  height: auto;
+  margin-top: 10px;
+  cursor: pointer;
+}
+.sub{
+  font-size: 13px;
+}
+  </style>
+</head>
+
+
+<body>
+  <header>
+    <div class="nav1">
+  <a href="javascript:history.back()">
+    <img src="images/back.png" alt="Back" class="back-arrow">
+  </a>
+</div>
+  </header>
+<div class="message" >
+  <p margin-bottom="10">
+Welcome to the online enrollment website of Padre Garcia Polytechnic College (PGPC). This platform is designed to provide a convenient and secure way for incoming students to enroll for the upcoming Academic Year 2025–2026.</p>
+<br>
+  <p margin-bottom="10">
+Enrollees are required to provide accurate and complete information to facilitate the evaluation and processing of their application. All submitted data will be reviewed by the Admission and Testing Office in accordance with institutional policies and admission guidelines.
+</p>
+<br>
+<p margin-bottom="10px">
+PGPC values your privacy and ensures that all personal and sensitive information collected through this platform will be handled in compliance with Republic Act No. 10173, or the Data Privacy Act of 2012, and its Implementing Rules and Regulations (IRR). Your data may only be disclosed to authorized partners or government agencies when legally required or contractually necessary.
+  </p>
+</div>
+  <div class="container">
+    <h3>I.STUDENT INFORMATION</h3>
+    <div class="subText">
+    <p><strong>TO THE STUDENT</strong></p><br>
+    <p><strong>PRINT</strong> legibly all information required. Only correctly and completely filled-out form will be accepted for processing</p>
+    </div>
+    <form id="form1" onsubmit="return saveData(event)" action="form2.html"> <label for="studentCourse">Program (Course):</label>
+      <select name="studentCourse" id="studentCourse" required>
+        <option value="" disabled selected>Select Course</option>
+        <option>BS Computer Science</option>
+        <option>BS Public Administration</option>
+        <option>BS Criminology</option>
+        <option>BS Management Accountancy</option>
+      </select>
+
+      <label for="lastName">Last Name:</label>
+      <input type="text" id="lastName" required>
+      <label for="firstName">First Name:</label>
+      <input type="text" id="firstName" required>
+
+      <label for="middleName">Middle Name:</label>
+      <input type="text" id="middleName" required>
+      
+      <label for="studentDate">Date of Birth:</label>
+      <input type="date" name="studentDate" id="studentDate" required>
+
+      <label for="studentBirthPlace">Place of Birth:</label>
+      <input type="text" name="studentBirthPlace" id="studentBirthPlace" required>
+
+      <label for="studentSex">Sex:</label>
+      <select name="studentSex" id="studentSex" required>
+        <option value="" disabled selected>Select Sex</option>
+        <option>Male</option>
+        <option>Female</option>
+      </select>
+
+      <label for="studentStatus">Civil Status:</label>
+      <select name="studentStatus" id="studentStatus" required>
+        <option value="" disabled selected>Select Status</option>
+        <option>Single</option>
+        <option>Married</option>
+        <option>Widower</option>
+      </select>
+
+      <label for="studentReligion">Religion:</label>
+      <input type="text" name="studentReligion" id="studentReligion" required>
+
+      <label for="studentCitizenship">Citizenship:</label>
+      <input type="text" name="studentCitizenship" id="studentCitizenship" required>
+
+      <label>Mobile No.:</label>
+      <input type="text" id="studentNumber" name="studentNumber"
+       placeholder="e.g., 09171234567" inputmode="numeric" required>
+
+      <label for="studentEmail">Email Address:</label>
+      <input type="email" name="studentEmail" id="studentEmail" required>
+
+      <label for="studentAddress">Permanent Address:</label>
+      <input type="text" name="studentAddress" id="studentAddress" required>
+
+      <label for="studentPostal">Postal Code:</label>
+      <input type="tel" name="studentPostal" id="studentPostal" pattern="[0-9]{4,6}" required>
+<div class="buttonContainer">
+      <button type="submit">Next</button>
+      </div>
+    </form>
+  </div>
+  <script>
+  
+/*function saveData(event) {
+  event.preventDefault(); // Prevents form from submitting immediately
+//para sa consent 
+  const lastname = document.getElementById('lastName').value;
+  const firstname = document.getElementById('firstName').value; 
+  localStorage.setItem('lastName', lastname);
+  localStorage.setItem('firstName', firstname);
+
+  // sa local storage ng browser muna to
+  localStorage.setItem('studentCourse', document.getElementById('studentCourse').value);
+  localStorage.setItem('studentDate', document.getElementById('studentDate').value);
+  localStorage.setItem('studentBirthPlace', document.getElementById('studentBirthPlace').value);
+  localStorage.setItem('studentSex', document.getElementById('studentSex').value);
+  localStorage.setItem('studentStatus', document.getElementById('studentStatus').value);
+  localStorage.setItem('studentReligion', document.getElementById('studentReligion').value);
+  localStorage.setItem('studentCitizenship', document.getElementById('studentCitizenship').value);
+  localStorage.setItem('studentNumber', document.getElementById('studentNumber').value);
+  localStorage.setItem('studentEmail', document.getElementById('studentEmail').value);
+  localStorage.setItem('studentAddress', document.getElementById('studentAddress').value);
+  localStorage.setItem('studentPostal', document.getElementById('studentPostal').value);
+
+  document.getElementById("form1").submit(); // Now submit after saving
+}*/
+    function saveData(event) {
+  event.preventDefault();
+  const firstNameInput = document.getElementById("firstName").value;
+  const lastNameInput = document.getElementById("lastName").value;
+  localStorage.setItem("firstName", firstNameInput);
+  localStorage.setItem("lastName", lastNameInput);
+  const form = document.getElementById('form1');
+  const formData = new FormData(form);
+
+  const form1Data = {};
+  formData.forEach((value, key) => {
+    form1Data[key] = value;
+    localStorage.setItem(key, value); // Store directly
+  });
+
+  window.location.href = "form2.html";
+}
+  </script>
+</body>
+</html>

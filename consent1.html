@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Consent Form</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom right, #bcd9f5, #f3c8d9);
+      color: #333;
+      line-height: 1.6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px 25px;
+      max-width: 700px;
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    h3 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #444;
+    }
+
+    .consent-text, form {
+      text-align: justify;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+
+    .next {
+      margin-top: 30px;
+      width: 100%;
+      padding: 12px;
+      background-color: #1877f2;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .next:hover {
+      background-color: #125ecb;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h3>CONSENT</h3>
+    <div class="consent-text">
+     <p>I am <strong id="pangalan"></strong>, fully aware that Padre Garcia Polytechnic College is obligated under the Data Privacy Act of 2012 and its Implementing Rules and Regulations (IRR) effective since September 8, 2016, to protect all my personal and sensitive information that it collects, processes, and retains upon my application for admission, enrolment and during my stay in the College. Likewise, I am fully aware that PGPC may share such information to affiliated or partner organizations as part of its contractual obligations, or with government agencies pursuant to law or legal processes. In this regard, I hereby allow PGPC to collect, process, use and share my personal data in the pursuit of its legitimate academic, research and employment purposes and/or interests as an educational institution.</p>
+    </div>
+
+    <h3>OATH</h3>
+    <form action="upload.html">
+      <label>
+        <input type="checkbox" required>
+        I hereby certify that all information supplied in this application form is complete and accurate. I also understand that any false information will disqualify me from being admitted to the College.
+      </label>
+
+      <button class="next" type="submit">Next</button>
+    </form>
+  </div>
+  <script>
+  
+  window.onload = function () {
+    const firstname = localStorage.getItem('firstName') || '';
+    const lastname = localStorage.getItem('lastName') || '';
+    const fullName = firstname + ' ' + lastname;
+
+    document.getElementById('pangalan').textContent = fullName;
+  };
+</script>  };
+  </script>
+</body>
+</html>

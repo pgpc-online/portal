@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Requirements Upload</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <style>
+    body { font-family: Arial; padding: 20px; max-width: 600px; margin: auto; font-size: 20px;}
+    input, label, button { display: block; margin-top: 10px; width: 100%; }
+    button { padding: 10px; }
+  </style>
+</head>
+<body>
+  
+<form id="uploadForm">
+  
+<h2>Upload Student Requirements</h2>
+<p style="font-size: 16px; color: #555; margin-top: -10px;">
+  Please upload the necessary documents to complete your application.
+</p>
+
+  <ul style="font-size: 15px; color: green; margin-top: 10px;">
+  <li>Make sure your 2x2 photo is clear and recent.</li>
+  <li>PSA Birth Certificate must be official and readable.</li>
+  <li>Good Moral Certificate is optional but recommended.</li>
+  </ul>
+  
+  <!--<label>Full Name:</label>
+  <input type="text" id="fullname" required>
+
+  <label>Email:</label>
+  <input type="email" id="email" required> -->
+
+  <label>2x2 Photo (JPG/PNG):</label>
+  <input type="file" id="photo" accept="image/*" required>
+
+  <label>PSA Birth Certificate (PDF or Image):</label>
+  <input type="file" id="psa" accept=".pdf,image/*" required>
+
+  <label>Good Moral Certificate (PDF or Image, optional):</label>
+  <input type="file" id="goodmoral" accept=".pdf,image/*">
+
+  <button type="submit">Submit</button>
+  
+  <div id="uploadingMessage" style="display:none; background: #E3F2FD; color: #4070F4; padding: 15px; border: 1px solid #ffeeba; border-radius: 5px; margin-top: 20px;">
+  Uploading... This may take a few moments. Please wait.
+  </div>
+</form>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
+    authDomain: "flipbook-a5350.firebaseapp.com",
+    databaseURL: "https://flipbook-a5350-default-rtdb.firebaseio.com",
+    projectId: "flipbook-a5350",
+    storageBucket: "flipbook-a5350.appspot.com",
+    messagingSenderId: "570378601966",
+    appId: "1:570378601966:web:96ebb77badba7e33107aff",
+    measurementId: "G-LCKP7BY0L7"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+  document.getElementById("uploadForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    document.getElementById("uploadingMessage").style.display = "block";
+
+    try {
+      // 1. Upload files
+      const photo = document.getElementById("photo").files[0];
+      const psa = document.getElementById("psa").files[0];
+      const goodmoral = document.getElementById("goodmoral").files[0];
+
+      const uploadFile = async (file, folder) => {
+        const ref = storage.ref(`${folder}/${Date.now()}_${file.name}`);
+        await ref.put(file);
+        return await ref.getDownloadURL();
+      };
+
+      const photoURL = await uploadFile(photo, 'photos');
+      const psaURL = await uploadFile(psa, 'psa');
+      const goodMoralURL = goodmoral ? await uploadFile(goodmoral, 'goodmoral') : null;
+
+      // 2. Collect ALL localStorage values into one object
+      const form1and2Data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        form1and2Data[key] = localStorage.getItem(key);
+      }
+
+      // 3. Add file URLs and timestamp to the object
+      const completeData = {
+        ...form1and2Data,
+        photoURL,
+        psaURL,
+        goodMoralURL,
+        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      // 4. Save everything to Firestore
+      await db.collection("studentApplications").add(completeData);
+
+      alert("All data uploaded successfully!");
+      document.getElementById("uploadForm").reset();
+      localStorage.clear(); // optional: clear storage
+      window.location.href = "congrats.html";
+
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("Something went wrong. Please try again.");
+    }
+  });
+</script>
+</body>
+</html>
