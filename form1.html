@@ -216,23 +216,21 @@
       return false; // Prevent form submission
     }
 
-    // If validations pass, save data to     const firstNameInput = document.getElementById("firstName").value;
+    // If validations pass, save data to       const firstNameInput = document.getElementById("firstName").value;
+  const lastNameInput = document.getElementById("lastName").value;
+  localStorage.setItem("firstName", firstNameInput);
+  localStorage.setItem("lastName", lastNameInput);
+  const form = document.getElementById('form1');
+  const formData = new FormData(form);
 
-const lastNameInput = document.getElementById("lastName").value;
+  const form1Data = {};
+  formData.forEach((value, key) => {
+    form1Data[key] = value;
+    localStorage.setItem(key, value); // Store directly
+  });
 
-    localStorage.setItem("firstName", firstNameInput);
-localStorage.setItem("lastName", lastNameInput);
-const form = document.getElementById( 'form1');
-
-const formData = new FormData(form);
-const form1Data = {};
-formData.forEach((value, key) => {
-form1Data[key] = value;
-localStorage.setItem(key, value);
-// Store directly
-});
-window.location.href = "form2.html";
-  }
+  window.location.href = "form2.html";
+}
 </script>
 
 </body>
