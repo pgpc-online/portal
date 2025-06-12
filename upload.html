@@ -50,6 +50,27 @@
     .btn:hover {
       background: #1d4ed8;
     }
+    .progress-container {
+      margin-top: 1rem;
+    }
+    .progress-bar {
+      width: 100%;
+      background: #e5e7eb;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      height: 20px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #2563eb;
+      transition: width 0.3s ease;
+    }
+    .status {
+      margin-top: 0.5rem;
+      font-weight: 500;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -57,20 +78,25 @@
   <div class="upload-container">
     <form id="uploadForm">
       <div class="form-group">
-        <label for="document">Choose File:</label>
-        <input type="file" id="document" required />
+        <label for="document">Choose File(s):</label>
+        <input type="file" id="document" multiple required />
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-bar-fill" id="progressBarFill"></div>
+        </div>
+        <div class="status" id="uploadStatus">Waiting for file...</div>
       </div>
       <button type="submit" class="btn">Submit</button>
     </form>
   </div>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <!-- Script -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
@@ -80,21 +106,22 @@
       messagingSenderId: "570378601966",
       appId: "1:570378601966:web:96ebb77badba7e33107aff"
     };
-
     firebase.initializeApp(firebaseConfig);
+
     const auth = firebase.auth();
     const storage = firebase.storage();
     const db = firebase.database();
 
     const uploadForm = document.getElementById('uploadForm');
     const fileInput = document.getElementById('document');
+    const progressBarFill = document.getElementById('progressBarFill');
+    const uploadStatus = document.getElementById('uploadStatus');
 
-    uploadForm.addEventListener('submit', function(e) {
+    uploadForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      const file = fileInput.files[0];
-
-      if (!file) {
-        alert('Please select a file.');
+      const files = fileInput.files;
+      if (files.length === 0) {
+        alert('Please select at least one file.');
         return;
       }
 
@@ -105,24 +132,47 @@
           return;
         }
 
-        const storageRef = storage.ref('uploads/' + user.uid + '/' + file.name);
-        const uploadTask = storageRef.put(file);
+        const uploadPromises = [];
+        let uploadedCount = 0;
 
-        uploadTask.on('state_changed', 
-          snapshot => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log('Upload is ' + progress + '% done');
-          }, 
-          error => {
-            alert('Upload failed: ' + error.message);
-          }, 
-          () => {
-            alert('Upload successful! Redirecting to your student portal...');
-            setTimeout(() => {
-              window.location.href = 'congrats.html';
-            }, 1500);
-          }
-        );
+        Array.from(files).forEach(file => {
+          const storageRef = storage.ref('uploads/' + user.uid + '/' + file.name);
+          const uploadTask = storageRef.put(file);
+
+          uploadPromises.push(new Promise((resolve, reject) => {
+            uploadTask.on('state_changed',
+              snapshot => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                progressBarFill.style.width = `${Math.floor(progress)}%`;
+                uploadStatus.textContent = `Uploading: ${file.name} (${Math.floor(progress)}%)`;
+              },
+              error => {
+                alert('Upload failed: ' + error.message);
+                reject(error);
+              },
+              () => {
+                uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+                  db.ref('studentApplications/' + user.uid + '/uploads').push({
+                    fileName: file.name,
+                    url: downloadURL,
+                    uploadedAt: new Date().toISOString()
+                  });
+                  uploadedCount++;
+                  resolve();
+                });
+              }
+            );
+          }));
+        });
+
+        Promise.all(uploadPromises).then(() => {
+          uploadStatus.textContent = 'All files uploaded successfully!';
+          setTimeout(() => {
+            window.location.href = 'congrats.html';
+          }, 2000);
+        }).catch(() => {
+          uploadStatus.textContent = 'Some files failed to upload.';
+        });
       });
     });
   </script>
