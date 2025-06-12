@@ -5,23 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Student Login</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script> <!-- 🔥 ADD THIS -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-       margin: 0;
+      margin: 0;
       padding: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
+      background: #f0f2f5;
     }
-
     .card {
       background: #fff;
       padding: 40px 30px;
@@ -30,107 +27,55 @@
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       opacity: 0;
-      animation-name: fadeIn;
-      animation-duration: 1s;
-      animation-fill-mode: forwards;
-      animation-delay: 1s;
+      animation: fadeIn 1s forwards 1s;
     }
-
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
-
-    .card h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #3f51b5;
-    }
-
+    .card h2 { text-align: center; margin-bottom: 20px; color: #3f51b5; }
     .card input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      transition: 0.3s;
+      width: 100%; padding: 12px; margin: 10px 0;
+      border-radius: 8px; border: 1px solid #ccc;
       font-size: 16px;
     }
-
-    .card input:focus {
-      border-color: #3f51b5;
-      outline: none;
-    }
-
+    .card input:focus { border-color: #3f51b5; outline: none; }
     .card button {
-      width: 100%;
-      background: #3f51b5;
-      color: white;
-      border: none;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 8px;
-      font-size: 16px;
+      width: 100%; background: #3f51b5; color: white;
+      border: none; padding: 12px; margin-top: 10px;
+      border-radius: 8px; font-size: 16px;
       cursor: pointer;
-      transition: 0.3s;
     }
-
-    .card button:hover {
-      background: #303f9f;
-    }
-
+    .card button:hover { background: #303f9f; }
     #switch {
-      margin-top: 15px;
-      text-align: center;
-      font-size: 14px;
-      color: #3f51b5;
-      cursor: pointer;
+      margin-top: 15px; text-align: center;
+      font-size: 14px; color: #3f51b5; cursor: pointer;
     }
-
     #errorMsg {
-      margin-top: 15px;
-      color: #e53935;
-      text-align: center;
-      font-size: 14px;
+      margin-top: 15px; color: #e53935;
+      text-align: center; font-size: 14px;
     }
-
-  .password-wrapper {
-    position: relative;
-  }
-
-  .password-wrapper input {
-    padding-right: 40px;
-  }
-
-  .toggle-password {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    font-size: 18px;
-    color: #777;
-    user-select: none;
-  }
-
-  .toggle-password:hover {
-    color: #3f51b5;
-  }
-</style>
+    .password-wrapper { position: relative; }
+    .password-wrapper input { padding-right: 40px; }
+    .toggle-password {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer; font-size: 18px;
+      color: #777; user-select: none;
+    }
+    .toggle-password:hover { color: #3f51b5; }
+  </style>
 </head>
 <body>
 
 <div class="card">
   <h2 id="formTitle">Student Login</h2>
-
   <form id="authForm">
     <input type="email" id="email" placeholder="Enter your email" required />
-
     <div class="password-wrapper">
       <input type="password" id="password" placeholder="Enter your password" required />
       <span class="toggle-password" onclick="togglePassword()">👁️</span>
     </div>
-
     <button type="submit" id="submitBtn">Login</button>
     <div id="switch">Don't have an account? Register here</div>
     <div id="errorMsg"></div>
@@ -138,14 +83,25 @@
 </div>
 
 <script>
+  // 👇 Prevent iframe embedding to allow Firebase Auth visibility check
+  if (window.top !== window.self) {
+    window.top.location = window.self.location;
+  }
+
   const firebaseConfig = {
     apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
     authDomain: "flipbook-a5350.firebaseapp.com",
-    projectId: "flipbook-a5350"
+    databaseURL: "https://flipbook-a5350-default-rtdb.firebaseio.com",
+    projectId: "flipbook-a5350",
+    storageBucket: "flipbook-a5350.appspot.com",
+    messagingSenderId: "570378601966",
+    appId: "1:570378601966:web:96ebb77badba7e33107aff",
+    measurementId: "G-LCKP7BY0L7"
   };
 
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
+  const db = firebase.firestore();
 
   const form = document.getElementById("authForm");
   const emailInput = document.getElementById("email");
@@ -180,33 +136,28 @@
       }
 
       localStorage.setItem("studentEmail", email);
-      
-
     } catch (error) {
       errorMsg.textContent = error.message;
     }
   });
 
   auth.onAuthStateChanged(async (user) => {
-  const onLoginPage = window.location.pathname.includes("login.html"); // adjust based on your actual file name
+    if (!user) return;
 
-  if (user && onLoginPage) {
     const email = user.email;
     localStorage.setItem("studentEmail", email);
 
-    const db = firebase.firestore();
-    const doc = await db.collection("studentApplications")
-                        .where("email", "==", email)
-                        .limit(1)
-                        .get();
+    const snapshot = await db.collection("studentApplications")
+      .where("email", "==", email)
+      .limit(1)
+      .get();
 
-    if (!doc.empty) {
+    if (!snapshot.empty) {
       window.location.href = "congrats.html";
     } else {
       window.location.href = "form1.html";
     }
-  }
-});
+  });
 
   function togglePassword() {
     const input = document.getElementById("password");
@@ -220,5 +171,6 @@
     }
   }
 </script>
+
 </body>
 </html>
