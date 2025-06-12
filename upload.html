@@ -12,8 +12,6 @@
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(to bottom right, #e0f7fa, #fce4ec);
-      color: #333;
-      line-height: 1.6;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -26,25 +24,23 @@
       padding: 30px;
       border-radius: 10px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      max-width: 1200px;
+      max-width: 600px;
       width: 100%;
     }
 
     h2 {
       text-align: center;
-      color: #274ce0;
-      margin-bottom: 20px;
+      color: #00796b;
     }
 
     p {
-      font-size: 16px;
+      text-align: center;
       color: #555;
       margin-top: -10px;
-      text-align: center;
     }
 
     ul {
-      font-size: 15px;
+      font-size: 14px;
       color: green;
       margin-top: 10px;
       padding-left: 20px;
@@ -56,194 +52,192 @@
       display: block;
     }
 
-    input[type="file"], input[type="radio"] {
-      margin-top: 10px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+    input[type="file"] {
+      margin-top: 5px;
       width: 100%;
-      font-size: 16px;
     }
 
     .radio-group {
-      margin-top: 10px;
       display: flex;
-      gap: 20px;
+      gap: 15px;
+      margin-top: 10px;
     }
 
     button {
       margin-top: 20px;
       padding: 12px;
-      background-color: #274ce0;
+      background-color: #00796b;
       color: white;
-      font-size: 16px;
-      font-weight: bold;
       border: none;
       border-radius: 6px;
+      font-size: 16px;
       cursor: pointer;
-      transition: background 0.3s ease, transform 0.2s;
-      width: 100%;
     }
 
     button:hover {
       background-color: #004d40;
-      transform: translateY(-2px);
     }
 
-    #uploadingMessage {
+    #progressContainer {
       display: none;
-      background: #E3F2FD;
-      color: #4070F4;
-      padding: 15px;
-      border: 1px solid #ffeeba;
-      border-radius: 5px;
-      margin-top: 20px;
-      text-align: center;
+      margin-top: 15px;
+    }
+
+    #progressBar {
+      width: 100%;
+      height: 20px;
+      background: #ccc;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    #progressFill {
+      height: 100%;
+      width: 0%;
+      background: #00796b;
+      transition: width 0.3s;
     }
 
     .conditional-upload {
       display: none;
     }
-
-    @media (max-width: 480px) {
-      form {
-        padding: 20px;
-      }
-
-      h2 {
-        font-size: 20px;
-      }
-
-      button {
-        font-size: 14px;
-      }
-    }
   </style>
 </head>
 <body>
+  <form id="uploadForm">
+    <h2>Upload Student Requirements</h2>
+    <p>Please upload the necessary documents.</p>
+    <ul>
+      <li>2x2 photo must be clear and recent.</li>
+      <li>PSA Birth Certificate must be readable.</li>
+      <li>Good Moral Certificate is optional.</li>
+    </ul>
 
-<form id="uploadForm">
-  <h2>Upload Student Requirements</h2>
-  <p>Please upload the necessary documents to complete your application.</p>
+    <label>Garciano?</label>
+    <div class="radio-group">
+      <label><input type="radio" name="isGarciano" value="yes" onclick="toggleBarangayUpload()"> Yes</label>
+      <label><input type="radio" name="isGarciano" value="no" onclick="toggleBarangayUpload()"> No</label>
+    </div>
 
-  <ul>
-    <li>Make sure your 2x2 photo is clear and recent.</li>
-    <li>PSA Birth Certificate must be official and readable.</li>
-    <li>Good Moral Certificate is optional but recommended.</li>
-  </ul>
+    <div class="conditional-upload" id="barangayUpload">
+      <label>Barangay Residency (PDF or Image):</label>
+      <input type="file" id="brgyPhoto" accept=".pdf,image/*">
+    </div>
 
-  <label>Garciano?</label>
-  <div class="radio-group">
-    <label><input type="radio" name="isGarciano" value="yes" onclick="toggleBarangayUpload()"> Yes</label>
-    <label><input type="radio" name="isGarciano" value="no" onclick="toggleBarangayUpload()"> No</label>
-  </div>
-  <hr>
+    <label>2x2 Photo (JPG/PNG):</label>
+    <input type="file" id="photo" accept="image/*" required>
 
-  <div class="conditional-upload" id="barangayUpload">
-    <label>Barangay Residency Document (PDF or Image):</label>
-    <input type="file" id="brgyPhoto" accept=".pdf,image/*">
-  </div>
+    <label>PSA Birth Certificate (PDF or Image):</label>
+    <input type="file" id="psa" accept=".pdf,image/*" required>
 
-  <label>2x2 Photo (JPG/PNG):</label>
-  <input type="file" id="photo" accept="image/*" required>
+    <label>Good Moral Certificate (optional):</label>
+    <input type="file" id="goodmoral" accept=".pdf,image/*">
 
-  <label>PSA Birth Certificate (PDF or Image):</label>
-  <input type="file" id="psa" accept=".pdf,image/*" required>
+    <button type="submit">Submit</button>
 
-  <label>Good Moral Certificate (PDF or Image, optional):</label>
-  <input type="file" id="goodmoral" accept=".pdf,image/*">
+    <div id="progressContainer">
+      <div id="progressBar">
+        <div id="progressFill"></div>
+      </div>
+    </div>
+  </form>
 
-  <button type="submit">Submit</button>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
+      authDomain: "flipbook-a5350.firebaseapp.com",
+      databaseURL: "https://flipbook-a5350-default-rtdb.firebaseio.com",
+      projectId: "flipbook-a5350",
+      storageBucket: "flipbook-a5350.appspot.com",
+      messagingSenderId: "570378601966",
+      appId: "1:570378601966:web:96ebb77badba7e33107aff",
+      measurementId: "G-LCKP7BY0L7"
+    };
 
-  <div id="uploadingMessage">Uploading... This may take a few moments. Please wait.</div>
-</form>
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    const storage = firebase.storage();
 
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
-    authDomain: "flipbook-a5350.firebaseapp.com",
-    databaseURL: "https://flipbook-a5350-default-rtdb.firebaseio.com",
-    projectId: "flipbook-a5350",
-    storageBucket: "flipbook-a5350.appspot.com",
-    messagingSenderId: "570378601966",
-    appId: "1:570378601966:web:96ebb77badba7e33107aff",
-    measurementId: "G-LCKP7BY0L7"
-  };
+    document.getElementById("uploadForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const progressContainer = document.getElementById("progressContainer");
+      const progressFill = document.getElementById("progressFill");
+      progressContainer.style.display = "block";
+      progressFill.style.width = "0%";
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.database();
-  const storage = firebase.storage();
+      auth.onAuthStateChanged(async user => {
+        if (!user) {
+          alert("User not logged in.");
+          return window.location.href = "login.html";
+        }
 
-  document.getElementById("uploadForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
-    document.getElementById("uploadingMessage").style.display = "block";
+        try {
+          const uid = user.uid;
+          const photo = document.getElementById("photo").files[0];
+          const psa = document.getElementById("psa").files[0];
+          const goodmoral = document.getElementById("goodmoral").files[0];
+          const brgyPhoto = document.getElementById("brgyPhoto").files[0];
+          const isGarciano = document.querySelector('input[name="isGarciano"]:checked')?.value || "no";
 
-    const user = auth.currentUser;
-    if (!user) {
-      alert("User not logged in.");
-      return window.location.href = "login.html";
+          const uploadFileWithProgress = (file, path) => {
+            return new Promise((resolve, reject) => {
+              const ref = storage.ref(`students/${uid}/${path}/${Date.now()}_${file.name}`);
+              const uploadTask = ref.put(file);
+
+              uploadTask.on('state_changed',
+                snapshot => {
+                  const percent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                  progressFill.style.width = percent.toFixed(0) + "%";
+                },
+                error => reject(error),
+                async () => {
+                  const url = await uploadTask.snapshot.ref.getDownloadURL();
+                  resolve(url);
+                }
+              );
+            });
+          };
+
+          const photoURL = await uploadFileWithProgress(photo, "2x2");
+          const psaURL = await uploadFileWithProgress(psa, "psa");
+          const goodMoralURL = goodmoral ? await uploadFileWithProgress(goodmoral, "goodmoral") : null;
+          const brgyPhotoURL = brgyPhoto ? await uploadFileWithProgress(brgyPhoto, "barangay") : null;
+
+          const form1and2Data = {};
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            form1and2Data[key] = localStorage.getItem(key);
+          }
+
+          const completeData = {
+            ...form1and2Data,
+            photoURL,
+            psaURL,
+            goodMoralURL,
+            brgyPhotoURL,
+            isGarciano,
+            submittedAt: new Date().toISOString()
+          };
+
+          await db.ref("students/" + uid).update(completeData);
+
+          alert("All files uploaded successfully!");
+          localStorage.clear();
+          window.location.href = "congrats.html";
+
+        } catch (error) {
+          console.error("Upload error:", error);
+          alert("Something went wrong. Please try again.");
+        }
+      });
+    });
+
+    function toggleBarangayUpload() {
+      const isGarciano = document.querySelector('input[name="isGarciano"]:checked');
+      const section = document.getElementById("barangayUpload");
+      section.style.display = isGarciano && isGarciano.value === "yes" ? "block" : "none";
     }
-
-    try {
-      const uid = user.uid;
-      const photo = document.getElementById("photo").files[0];
-      const psa = document.getElementById("psa").files[0];
-      const goodmoral = document.getElementById("goodmoral").files[0];
-      const brgyPhoto = document.getElementById("brgyPhoto").files[0];
-
-      if (!photo || !psa) {
-        alert("Please upload the required 2x2 photo and PSA certificate.");
-        return;
-      }
-
-      const uploadFile = async (file, path) => {
-        const ref = storage.ref(`students/${uid}/${path}/${Date.now()}_${file.name}`);
-        await ref.put(file);
-        return await ref.getDownloadURL();
-      };
-
-      const photoURL = await uploadFile(photo, "2x2");
-      const psaURL = await uploadFile(psa, "psa");
-      const goodMoralURL = goodmoral ? await uploadFile(goodmoral, "goodmoral") : null;
-      const brgyPhotoURL = brgyPhoto ? await uploadFile(brgyPhoto, "barangay") : null;
-
-      const form1and2Data = {};
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        form1and2Data[key] = localStorage.getItem(key);
-      }
-
-      const completeData = {
-        ...form1and2Data,
-        photoURL,
-        psaURL,
-        goodMoralURL,
-        brgyPhotoURL,
-        isGarciano: document.querySelector('input[name="isGarciano"]:checked')?.value || "no",
-        submittedAt: new Date().toISOString()
-      };
-
-      await db.ref("students/" + uid).update(completeData);
-
-      alert("All data uploaded successfully!");
-      localStorage.clear();
-      window.location.href = "congrats.html";
-
-    } catch (error) {
-      console.error("Upload failed:", error);
-      alert("Something went wrong. Please try again.");
-    }
-  });
-
-  function toggleBarangayUpload() {
-    const barangayUpload = document.getElementById("barangayUpload");
-    const isGarciano = document.querySelector('input[name="isGarciano"]:checked');
-    barangayUpload.style.display = isGarciano && isGarciano.value === "yes" ? "block" : "none";
-  }
-
-  window.addEventListener("DOMContentLoaded", toggleBarangayUpload);
-</script>
-
+  </script>
 </body>
 </html>
