@@ -557,6 +557,31 @@
     border-radius: 5px;
     border: 0;
   }
+  .course-details {
+            display: none;
+            text-align: center;
+            margin: 20px;
+        }
+        .banner {
+            width: 100%;
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+            margin-bottom: 20px;
+        }
+        .quote {
+            font-style: italic;
+            color: #6b7280;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #2563ea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
   </style>
 </head>
 <body>
@@ -571,9 +596,10 @@
     <ul class="nav-contents" id="nav-contents" role="menu" tabindex="-1">
       <li role="none"><a href="#about" role="menuitem" tabindex="-1">About Us</a></li>
       <li role="none"><a href="#courses" role="menuitem" tabindex="-1">Courses Offered</a></li>
-      <li role="none"><a href="#teachers" role="menuitem" tabindex="-1">See Teachers</a></li>
-      <li role="none"><a href="#apply" role="menuitem" tabindex="-1">How to Enroll</a></li>
+      <!-- <li role="none"><a href="#teachers" role="menuitem" tabindex="-1">See Teachers</a></li>
+      <li role="none"><a href="#apply" role="menuitem" tabindex="-1">How to Enroll</a></li>-->
       <li role="none"><a href="#contact" role="menuitem" tabindex="-1">Contact Us</a></li>
+      <li role="none"><a href="student-login.html" role="menuitem" tabindex="-1">Apply Now</a></li>
     </ul>
   </nav>
 </header>
@@ -614,7 +640,7 @@
     <img src="template/cs.png" alt="" aria-hidden="true" />
   </div>
         BS Computer Science</h3>
-      <p id="course1-desc" style="font-weight: 400; font-size: 0.95rem; margin-top: 0.25rem; color: #374151;">
+      <p id="course1-desc" style="font-weight: 400; font-size: 0.95rem; margin-top: 0.25rem; color: #374151;" onclick="showCourse('computer-science')">
         Explore programming, algorithms, and software development to build innovative tech solutions.
       </p>
     </article>
@@ -623,7 +649,7 @@
     <img src="template/ma.png" alt="" aria-hidden="true" />
   </div>
         BS Management Accounting</h3>
-      <p id="course2-desc" style="font-weight: 400; font-size: 0.95rem; margin-top: 0.25rem; color: #374151;">
+      <p id="course2-desc" style="font-weight: 400; font-size: 0.95rem; margin-top: 0.25rem; color: #374151;" onclick="showCourse('management-accounting')">
         Learn financial management, cost control, and business analytics to guide organizational success.
       </p>
     </article>
@@ -631,7 +657,7 @@
       <h3 id="course3-title"> <div class="icon">
     <img src="template/pa.png" alt="" aria-hidden="true" />
   </div>B Public Administration</h3>
-      <p id="course3-desc" style="font-weight: 400; font-size: 0.95rem; margin-top: 0.25rem; color: #374151;">
+      <p id="course3-desc" style="font-weight: 400; font-size: 0.95rem; margin-top: 0.25rem; color: #374151;" onclick="showCourse('public-administration')">
         Dive into governance, policy-making, and public service leadership to shape communities.
       </p>
     </article>
@@ -639,13 +665,19 @@
       <h3 id="course4-title"><div class="icon">
     <img src="template/crim.png" alt="" aria-hidden="true" />
   </div>BS Criminology</h3>
-      <p id="course4-desc" style="font-weight: 400; font-size: 0.95rem; margin-top: 0.25rem; color: #374151;">
+      <p id="course4-desc" style="font-weight: 400; font-size: 0.95rem; margin-top: 0.25rem; color: #374151;" onclick="showCourse('criminology')">
         Study law enforcement, forensic science, and criminal behavior to contribute to public safety.
       </p>
     </article>
   </div>
 </section>
-
+<div class="course-details" id="course-details">
+        <div class="banner" id="course-banner"></div>
+        <h1 id="course-title"></h1>
+        <p id="course-description"></p>
+        <p class="quote" id="course-quote"></p>
+        <a href="#" class="back-button" onclick="hideCourse()">Back to Courses</a>
+    </div>
 
     
     <h2 class="haha">News </h2>
@@ -676,6 +708,48 @@
 </footer>
 
 <script>
+  function showCourse(course) {
+            const details = {
+                'computer-science': {
+                    title: 'BS Computer Science',
+                    description: 'Explore programming, algorithms, and software development to build innovative tech solutions.',
+                    quote: '"The only way to do great work is to love what you do." - Steve Jobs',
+                    banner: 'url(Cs.jpg)' // Replace with actual image path
+                },
+                'management-accounting': {
+                    title: 'BS Management Accounting',
+                    description: 'Learn financial management, cost control, and business analytics to guide organizational success.',
+                    quote: '"Success is not the key to happiness. Happiness is the key to success." - Albert Schweitzer',
+                    banner: 'url(Ma.jpg)' // Replace with actual image path
+                },
+                'public-administration': {
+                    title: 'BS Public Administration',
+                    description: 'Dive into governance, policy-making, and public service leadership to shape communities.',
+                    quote: '"The best way to predict the future is to create it." - Peter Drucker',
+                    banner: 'url(Pa.jpg)' // Replace with actual image path
+                },
+                'criminology': {
+                    title: 'BS Criminology',
+                    description: 'Study law enforcement, forensic science, and criminal behavior to contribute to public safety.',
+                    quote: '"Justice delayed is justice denied." - William E. Gladstone',
+                    banner: 'url(Crim.jpg)' // Replace with actual image path
+                }
+            };
+
+            const courseDetail = details[course];
+            document.getElementById('course-title').innerText = courseDetail.title;
+            document.getElementById('course-description').innerText = courseDetail.description;
+            document.getElementById('course-quote').innerText = courseDetail.quote;
+            document.getElementById('course-banner').style.backgroundImage = courseDetail.banner;
+
+            document.querySelector('.courses').style.display = 'none';
+            document.getElementById('course-details').style.display = 'block';
+        }
+
+        function hideCourse() {
+            document.querySelector('.courses').style.display = 'flex';
+            document.getElementById('course-details').style.display = 'none';
+        }
   // Navigation menu toggle on mobile
   const menuToggle = document.getElementById('menu-toggle');
   const navContents = document.getElementById('nav-contents');
@@ -688,4 +762,3 @@
 </script>
 </body>
 </html>
-
