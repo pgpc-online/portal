@@ -1,267 +1,143 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Student Homepage</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/feather-icons"></script>
+  <title>Admin Dashboard – PGPC</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #f3f4f6;
-      --text: #1f2937;
-      --card: #ffffff;
-      --accent: #2563eb;
-      --header: #111827;
-    }
-    body.dark {
-      --bg: #1f2937;
-      --text: #f3f4f6;
-      --card: #111827;
-      --header: #0f172a;
-    }
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      transition: background 0.3s ease, color 0.3s ease;
-    }
-    header {
-      background-color: var(--header);
-      color: white;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 1.5rem;
-    }
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    main {
-      padding: 2rem;
-      max-width: 900px;
-      margin: auto;
-    }
-    section {
-      background: var(--card);
-      border-radius: 1rem;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-      padding: 2rem;
-      margin-bottom: 2rem;
-      transition: background 0.3s ease;
-    }
-    h2 {
-      margin-top: 0;
-    }
-    .info-item {
-      margin-bottom: 0.75rem;
-    }
-    .info-item strong {
-      display: inline-block;
-      width: 150px;
-    }
-    .btn {
-      background-color: var(--accent);
-      color: white;
-      padding: 0.6rem 1.2rem;
-      border: none;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background-color 0.3s ease;
-    }
-    .btn:hover {
-      background-color: #1d4ed8;
-    }
-    .btn-secondary {
-      background-color: transparent;
-      color: var(--accent);
-      border: 2px solid var(--accent);
-    }
-    .btn-secondary:hover {
-      background-color: var(--accent);
-      color: white;
-    }
-    .profile-pic {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid var(--accent);
-    }
-    .welcome-message {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-    .notif-panel {
-      display: none;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      background: var(--card);
-      border-radius: 0.75rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    .notif-panel.active {
-      display: block;
-      animation: fadeIn 0.3s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .icon-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: white;
-      font-size: 1.5rem;
-      transition: color 0.3s ease;
-    }
-    .icon-btn:hover {
-      color: var(--accent);
-    }
-    @media (max-width: 600px) {
-      .info-item strong {
-        display: block;
-        margin-bottom: 0.25rem;
-      }
-    }
+    /*... your existing CSS ...*/
   </style>
 </head>
 <body>
   <header>
-    <h1>Student Portal</h1>
-    <div class="header-right">
-      <button class="icon-btn" id="notifBtn" title="View Notifications"><i data-feather="bell"></i></button>
-      <button class="icon-btn" id="darkModeToggle" title="Toggle Dark Mode"><i data-feather="moon"></i></button>
-      <button class="btn" id="logoutBtn">Logout</button>
-      <a href="index.html" class="btn btn-secondary">Home</a>
-    </div>
-  </header>
-  <main>
-    <div class="welcome-message">
-      <img id="profilePic" class="profile-pic" src="" alt="Profile Picture" />
-      <div>
-        <h2 id="welcomeText">Hi, Student! Welcome to your homepage.</h2>
+    <nav>
+      <div id="admin-profile" style="display:flex;align-items:center;gap:10px;">
+        <img id="profile-pic" src="default-admin.png" alt="Admin" width="40" height="40" style="border-radius:50%;" />
       </div>
-    </div>
-    <section class="notif-panel" id="notifPanel">
-      <h2>Notifications from Admin</h2>
-      <ul id="notifications">
-        <li>Loading...</li>
-      </ul>
+      <div class="logo">PGPC Admin</div>
+      <div class="nav-links">
+        <a href="adminhome.php">Dashboard</a>
+        <a href="students.php">Students</a>
+        <a href="statistics.php">Statistics</a>
+        <button id="logout-btn" class="logout-btn">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Welcome to PGPC Admin Dashboard</h1>
+      <p>Manage student information, review statuses, and explore statistics.</p>
+      <button id="refresh-btn">Refresh Data</button>
     </section>
-    <section>
-      <h2>Your Information</h2>
-      <div class="info-item"><strong>Full Name:</strong> <span id="fullName">Loading...</span></div>
-      <div class="info-item"><strong>Email:</strong> <span id="email">Loading...</span></div>
-      <div class="info-item"><strong>Course:</strong> <span id="course">Loading...</span></div>
-      <div class="info-item"><strong>Number:</strong> <span id="number">Loading...</span></div>
-      <div class="info-item"><strong>Status:</strong> <span id="status">Loading...</span></div>
+
+    <section class="stats-grid">
+      <article class="card">
+        <h2>Total Students</h2>
+        <div class="value" id="total-students">0</div>
+      </article>
+      <article class="card">
+        <h2>Pending for Examination</h2>
+        <div class="value" id="pending-exam">0</div>
+      </article>
+      <article class="card"><h2>Gender Distribution</h2>
+        <div><canvas id="genderChart"></canvas></div>
+      </article>
+      <article class="card"><h2>Course Distribution</h2>
+        <div><canvas id="courseChart"></canvas></div>
+      </article>
+      <article class="card"><h2>Garciano vs Non‑Garciano</h2>
+        <div><canvas id="garcianoChart"></canvas></div>
+      </article>
     </section>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Photo</th><th>Name</th><th>Email</th><th>Gender</th><th>Course</th>
+          <th>Guardian</th><th>Address</th><th>Birthdate</th><th>Phone</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="studentTable"></tbody>
+    </table>
   </main>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <footer>© 2024 PGPC Admin Dashboard. All rights reserved.</footer>
 
   <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
-    authDomain: "flipbook-a5350.firebaseapp.com",
-    projectId: "flipbook-a5350",
-    storageBucket: "flipbook-a5350.appspot.com",
-    messagingSenderId: "570378601966",
-    appId: "1:570378601966:web:96ebb77badba7e33107aff"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.database();
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
+      authDomain: "flipbook-a5350.firebaseapp.com",
+      projectId: "flipbook-a5350",
+      storageBucket: "flipbook-a5350.appspot.com",
+      messagingSenderId: "570378601966",
+      appId: "1:570378601966:web:96ebb77badba7e33107aff"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
 
-  const welcomeText = document.getElementById('welcomeText');
-  const fullNameEl = document.getElementById('fullName');
-  const emailEl = document.getElementById('email');
-  const courseEl = document.getElementById('course');
-  const numberEl = document.getElementById('number');
-  const statusEl = document.getElementById('status');
-  const profilePic = document.getElementById('profilePic');
-  const notificationsEl = document.getElementById('notifications');
-  const notifPanel = document.getElementById('notifPanel');
-  const notifBtn = document.getElementById('notifBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const darkModeToggle = document.getElementById('darkModeToggle');
+    const totalEl = document.getElementById('total-students');
+    const pendingEl = document.getElementById('pending-exam');
+    const studentTbody = document.getElementById('studentTable');
+    const profilePic = document.getElementById('profile-pic');
 
-  auth.onAuthStateChanged(user => {
-    if (!user) {
-      alert("You are not logged in. Redirecting...");
-      window.location.href = 'login.html';
-      return;
+    const charts = {
+      gender: new Chart(document.getElementById('genderChart'), {type:'doughnut', data:{labels:[],datasets:[{data:[],backgroundColor:['#3498db','#e74c3c']}]}}),
+      course: new Chart(document.getElementById('courseChart'), {type:'bar', data:{labels:[],datasets:[{data:[],backgroundColor:'#2ecc71'}]}}),
+      garciano: new Chart(document.getElementById('garcianoChart'), {type:'pie', data:{labels:['Garciano','Non-Garciano'],datasets:[{data:[0,0],backgroundColor:['#9b59b6','#f1c40f']}]}})
+    };
+
+    async function loadData() {
+      const snapshot = await db.collection('students').get();
+      const stats = { pending:0, gender:{}, course:{}, garciano:0, nonG:0 };
+      studentTbody.innerHTML='';
+
+      snapshot.forEach(doc => {
+        const s = doc.data();
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><img src="${s.photoURL||'https://via.placeholder.com/50'}" width="40"></td>
+          <td>${s.name||''}</td><td>${s.email||''}</td><td>${s.gender||''}</td>
+          <td>${s.course||''}</td><td>${s.guardian||''}</td><td>${s.address||''}</td>
+          <td>${s.birthdate||''}</td><td>${s.phone||''}</td><td>${s.status||''}</td>`;
+        studentTbody.appendChild(row);
+
+        stats.pending += s.status==='Pending'?1:0;
+        stats.gender[s.gender] = (stats.gender[s.gender]||0)+1;
+        stats.course[s.course] = (stats.course[s.course]||0)+1;
+        if ((s.barangay||'').toLowerCase() === 'garciano') stats.garciano++;
+        else stats.nonG++;
+      });
+
+      totalEl.textContent = snapshot.size;
+      pendingEl.textContent = stats.pending;
+
+      updateChart(charts.gender, stats.gender);
+      updateChart(charts.course, stats.course);
+      charts.garciano.data.datasets[0].data = [stats.garciano, stats.nonG];
+      charts.garciano.update();
     }
 
-    const studentRef = db.ref('students/' + user.uid);
-    studentRef.once('value').then(snapshot => {
-      const data = snapshot.val();
-      if (data) {
-        const firstName = data.firstName || 'Student';
-const middleName = data.middleName || '';
-const lastName = data.lastName || '';
-const fullName = `${firstName} ${middleName} ${lastName}`.trim().replace(/\s+/g, ' ');
+    function updateChart(chart, dataMap) {
+      chart.data.labels = Object.keys(dataMap);
+      chart.data.datasets[0].data = Object.values(dataMap);
+      chart.update();
+    }
 
-fullNameEl.textContent = fullName;
-welcomeText.textContent = `Hi, ${firstName}! Welcome to your homepage.`;
-        emailEl.textContent = data.studentEmail || user.email;
-        courseEl.textContent = data.studentCourse || 'N/A';
-        numberEl.textContent = data.studentNumber || 'N/A';
-        statusEl.textContent = data.status || 'Pending';
-        
-        profilePic.src = data.photoURL || 'https://via.placeholder.com/80';
-      }
+    document.getElementById('refresh-btn').onclick = loadData;
+    document.getElementById('logout-btn').onclick = () => auth.signOut().then(() => window.location.href='index.html');
+
+    auth.onAuthStateChanged(user => {
+      if (!user) return window.location.href = 'index.html';
+      profilePic.src = user.photoURL || 'default-admin.png';
+      loadData();
     });
-
-    const msgRef = db.ref('adminMessages/' + user.uid);
-    msgRef.on('value', snapshot => {
-      const messages = snapshot.val();
-      notificationsEl.innerHTML = '';
-      if (messages) {
-        Object.values(messages).forEach(msg => {
-          const li = document.createElement('li');
-          li.textContent = msg;
-          notificationsEl.appendChild(li);
-        });
-        notifBtn.style.display = 'inline'; // show notif icon if messages exist
-      } else {
-        notifPanel.style.display = 'none'; // hide the panel if there are no messages
-        notifBtn.style.display = 'none';   // hide bell icon
-      }
-    });
-  });
-
-  logoutBtn.addEventListener('click', () => {
-    auth.signOut().then(() => {
-      window.location.href = 'index.html';
-    });
-  });
-
-  notifBtn.addEventListener('click', () => {
-    notifPanel.classList.toggle('active');
-  });
-
-  darkModeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark');
-  });
-
-  feather.replace();
-</script>
+  </script>
 </body>
 </html>
