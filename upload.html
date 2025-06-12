@@ -175,83 +175,88 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
-      authDomain: "flipbook-a5350.firebaseapp.com",
-      projectId: "flipbook-a5350",
-      storageBucket: "flipbook-a5350.appspot.com",
-      messagingSenderId: "570378601966",
-      appId: "1:570378601966:web:96ebb77badba7e33107aff"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();const welcomeText = document.getElementById('welcomeText');
-const fullNameEl = document.getElementById('fullName');
-const emailEl = document.getElementById('email');
-const courseEl = document.getElementById('course');
-const numberEl = document.getElementById('number');
-const statusEl = document.getElementById('status');
-const profilePic = document.getElementById('profilePic');
-const notificationsEl = document.getElementById('notifications');
-const logoutBtn = document.getElementById('logoutBtn');
-const notifBtn = document.getElementById('notifBtn');
-const notifPanel = document.getElementById('notifPanel');
-const darkModeToggle = document.getElementById('darkModeToggle');
+  const firebaseConfig = {
+    apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
+    authDomain: "flipbook-a5350.firebaseapp.com",
+    projectId: "flipbook-a5350",
+    storageBucket: "flipbook-a5350.appspot.com",
+    messagingSenderId: "570378601966",
+    appId: "1:570378601966:web:96ebb77badba7e33107aff"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.database();
 
-auth.onAuthStateChanged(user => {
-  if (!user) {
-    alert("You are not logged in. Redirecting...");
-    window.location.href = 'login.html';
-    return;
-  }
-  const studentRef = db.ref('students/' + user.uid);
-  studentRef.once('value').then(snapshot => {
-    const data = snapshot.val();
-    if (data) {
-      const firstName = data.fullName?.split(' ')[0] || 'Student';
-      fullNameEl.textContent = data.fullName || 'N/A';
-      emailEl.textContent = data.studentEmail || user.email;
-      courseEl.textContent = data.studentCourse || 'N/A';
-      numberEl.textContent = data.studentNumber || 'N/A';
-      statusEl.textContent = data.status || 'Pending';
-      welcomeText.textContent = `Hi, ${firstName}! Welcome to your homepage.`;
-      profilePic.src = data.photoURL || 'https://via.placeholder.com/80';
+  const welcomeText = document.getElementById('welcomeText');
+  const fullNameEl = document.getElementById('fullName');
+  const emailEl = document.getElementById('email');
+  const courseEl = document.getElementById('course');
+  const numberEl = document.getElementById('number');
+  const statusEl = document.getElementById('status');
+  const profilePic = document.getElementById('profilePic');
+  const notificationsEl = document.getElementById('notifications');
+  const notifPanel = document.getElementById('notifPanel');
+  const notifBtn = document.getElementById('notifBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const darkModeToggle = document.getElementById('darkModeToggle');
+
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      alert("You are not logged in. Redirecting...");
+      window.location.href = 'login.html';
+      return;
     }
+
+    const studentRef = db.ref('students/' + user.uid);
+    studentRef.once('value').then(snapshot => {
+      const data = snapshot.val();
+      if (data) {
+        const firstName = data.fullName?.split(' ')[0] || 'Student';
+        fullNameEl.textContent = data.fullName || 'N/A';
+        emailEl.textContent = data.studentEmail || user.email;
+        courseEl.textContent = data.studentCourse || 'N/A';
+        numberEl.textContent = data.studentNumber || 'N/A';
+        statusEl.textContent = data.status || 'Pending';
+        welcomeText.textContent = `Hi, ${firstName}! Welcome to your homepage.`;
+        profilePic.src = data.photoURL || 'https://via.placeholder.com/80';
+      }
+    });
+
+    const msgRef = db.ref('adminMessages/' + user.uid);
+    msgRef.on('value', snapshot => {
+      const messages = snapshot.val();
+      notificationsEl.innerHTML = '';
+      if (messages) {
+        Object.values(messages).forEach(msg => {
+          const li = document.createElement('li');
+          li.textContent = msg;
+          notificationsEl.appendChild(li);
+        });
+        notifBtn.style.display = 'inline'; // show notif icon if messages exist
+      } else {
+        notifPanel.style.display = 'none'; // hide the panel if there are no messages
+        notifBtn.style.display = 'none';   // hide bell icon
+      }
+    });
   });
 
-  const msgRef = db.ref('adminMessages/' + user.uid);
-  msgRef.on('value', snapshot => {
-    const messages = snapshot.val();
-    notificationsEl.innerHTML = '';
-    if (messages) {
-      Object.values(messages).forEach(msg => {
-        const li = document.createElement('li');
-        li.textContent = msg;
-        notificationsEl.appendChild(li);
-      });
-    } else {
-      notificationsEl.innerHTML = '<li>No messages yet.</li>';
-    }
+  logoutBtn.addEventListener('click', () => {
+    auth.signOut().then(() => {
+      window.location.href = 'index.html';
+    });
   });
-});
 
-logoutBtn.addEventListener('click', () => {
-  auth.signOut().then(() => {
-    window.location.href = 'index.html';
+  notifBtn.addEventListener('click', () => {
+    notifPanel.classList.toggle('active');
   });
-});
 
-notifBtn.addEventListener('click', () => {
-  notifPanel.classList.toggle('active');
-});
+  darkModeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+  });
 
-darkModeToggle.addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-});
-
-feather.replace();
-
-  </script>
+  feather.replace();
+</script>
 </body>
 </html>
