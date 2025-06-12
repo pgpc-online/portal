@@ -1,61 +1,276 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <title>Congratulations</title>
-  <style>
-    body {
-      font-family: 'IBM Plex Sans', sans-serif;
-      background: #f5f5f5;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    .message-box {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      text-align: center;
-      box-shadow: 0 0 10px #aaa;
-    }
-    h1 {
-      color: #002444;
-    }
-    .but {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: #1260cc;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-    .but:hover {
-      background: #002444;
-    }
-  </style>
-</head>
-<body>
-  <div class="message-box">
-    <h2>Congratulations, <strong id="student"></strong></h2>
-    <p>Your enrollment has been submitted successfully.</p>
-    <a class="but" href="index.html">Return to Homepage</a>
-    <a class="but" href="summary.html">Peview Form</a>
-  </div>
-  <script>
-    
-  window.onload = function () {
-    const studentname = localStorage.getItem('firstName');
-    //const lastname = localStorage.getItem('lastName') || '';
-   // const fullName = firstname + ' ' + lastname;
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+  <meta charset="UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />  
+  <title>Student Homepage</title>  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />  
+  <script src="https://unpkg.com/feather-icons"></script>  
+  <style>  
+    :root {  
+      --bg: #f3f4f6;  
+      --text: #1f2937;  
+      --card: #ffffff;  
+      --accent: #2563eb;  
+      --header: #111827;  
+    }  body.dark {  
+  --bg: #1f2937;  
+  --text: #f3f4f6;  
+  --card: #111827;  
+  --header: #0f172a;  
+}  
 
-    document.getElementById('student').textContent = studentname;
+* {  
+  box-sizing: border-box;  
+}  
+
+body {  
+  margin: 0;  
+  font-family: 'Inter', sans-serif;  
+  background-color: var(--bg);  
+  color: var(--text);  
+  transition: background 0.3s ease, color 0.3s ease;  
+}  
+
+header {  
+  background-color: var(--header);  
+  color: white;  
+  padding: 1rem 2rem;  
+  display: flex;  
+  justify-content: space-between;  
+  align-items: center;  
+  flex-wrap: wrap;  
+}  
+
+header h1 {  
+  margin: 0;  
+  font-size: 1.5rem;  
+}  
+
+.header-right {  
+  display: flex;  
+  align-items: center;  
+  gap: 1rem;  
+}  
+
+main {  
+  padding: 2rem;  
+  max-width: 900px;  
+  margin: auto;  
+}  
+
+section {  
+  background: var(--card);  
+  border-radius: 1rem;  
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);  
+  padding: 2rem;  
+  margin-bottom: 2rem;  
+  transition: background 0.3s ease;  
+}  
+
+h2 {  
+  margin-top: 0;  
+}  
+
+.info-item {  
+  margin-bottom: 0.75rem;  
+}  
+
+.info-item strong {  
+  display: inline-block;  
+  width: 150px;  
+}  
+
+.btn {  
+  background-color: var(--accent);  
+  color: white;  
+  padding: 0.6rem 1.2rem;  
+  border: none;  
+  border-radius: 0.5rem;  
+  cursor: pointer;  
+  font-size: 1rem;  
+  transition: background-color 0.3s ease;  
+}  
+
+.btn:hover {  
+  background-color: #1d4ed8;  
+}  
+
+.btn-secondary {  
+  background-color: transparent;  
+  color: var(--accent);  
+  border: 2px solid var(--accent);  
+}  
+
+.btn-secondary:hover {  
+  background-color: var(--accent);  
+  color: white;  
+}  
+
+.profile-pic {  
+  width: 80px;  
+  height: 80px;  
+  border-radius: 50%;  
+  object-fit: cover;  
+  border: 3px solid var(--accent);  
+}  
+
+.welcome-message {  
+  display: flex;  
+  align-items: center;  
+  gap: 1rem;  
+  margin-bottom: 1rem;  
+}  
+
+.notif-panel {  
+  display: none;  
+  padding: 1rem;  
+  margin-bottom: 1rem;  
+  background: var(--card);  
+  border-radius: 0.75rem;  
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  
+}  
+
+.notif-panel.active {  
+  display: block;  
+  animation: fadeIn 0.3s ease;  
+}  
+
+@keyframes fadeIn {  
+  from { opacity: 0; transform: translateY(-10px); }  
+  to { opacity: 1; transform: translateY(0); }  
+}  
+
+.icon-btn {  
+  background: none;  
+  border: none;  
+  cursor: pointer;  
+  color: white;  
+  font-size: 1.5rem;  
+  transition: color 0.3s ease;  
+}  
+
+.icon-btn:hover {  
+  color: var(--accent);  
+}  
+
+@media (max-width: 600px) {  
+  .info-item strong {  
+    display: block;  
+    margin-bottom: 0.25rem;  
+  }  
+}
+
+  </style>  
+</head>  
+<body>  
+  <header>  
+    <h1>Student Portal</h1>  
+    <div class="header-right">  
+      <button class="icon-btn" id="notifBtn" title="View Notifications"><i data-feather="bell"></i></button>  
+      <button class="icon-btn" id="darkModeToggle" title="Toggle Dark Mode"><i data-feather="moon"></i></button>  
+      <button class="btn" id="logoutBtn">Logout</button>  
+      <a href="index.html" class="btn btn-secondary">Home</a>  
+    </div>  
+  </header>    <main>  
+    <div class="welcome-message">  
+      <img id="profilePic" class="profile-pic" src="" alt="Profile Picture" />  
+      <div>  
+        <h2 id="welcomeText">Hi, Student! Welcome to your homepage.</h2>  
+      </div>  
+    </div>  <section class="notif-panel" id="notifPanel">  
+  <h2>Notifications from Admin</h2>  
+  <ul id="notifications">  
+    <li>Loading...</li>  
+  </ul>  
+</section>  
+
+<section>  
+  <h2>Your Information</h2>  
+  <div class="info-item"><strong>Full Name:</strong> <span id="fullName">Loading...</span></div>  
+  <div class="info-item"><strong>Email:</strong> <span id="email">Loading...</span></div>  
+  <div class="info-item"><strong>Course:</strong> <span id="course">Loading...</span></div>  
+  <div class="info-item"><strong>Number:</strong> <span id="number">Loading...</span></div>  
+  <div class="info-item"><strong>Status:</strong> <span id="status">Loading...</span></div>  
+</section>
+
+  </main>    <!-- Firebase Scripts -->    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>    <script>  
+    const firebaseConfig = {  
+      apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",  
+      authDomain: "flipbook-a5350.firebaseapp.com",  
+      projectId: "flipbook-a5350",  
+      storageBucket: "flipbook-a5350.appspot.com",  
+      messagingSenderId: "570378601966",  
+      appId: "1:570378601966:web:96ebb77badba7e33107aff"  
+    };  
+    firebase.initializeApp(firebaseConfig);  
+    const auth = firebase.auth();  
+    const db = firebase.database();  
   
-  };
-  </script>
-</body>
-</html>
+    const welcomeText = document.getElementById('welcomeText');  
+    const fullNameEl = document.getElementById('fullName');  
+    const emailEl = document.getElementById('email');  
+    const courseEl = document.getElementById('course');  
+    const numberEl = document.getElementById('number');  
+    const statusEl = document.getElementById('status');  
+    const profilePic = document.getElementById('profilePic');  
+    const notificationsEl = document.getElementById('notifications');  
+    const logoutBtn = document.getElementById('logoutBtn');  
+    const notifBtn = document.getElementById('notifBtn');  
+    const notifPanel = document.getElementById('notifPanel');  
+    const darkModeToggle = document.getElementById('darkModeToggle');  
+  
+    auth.onAuthStateChanged(user => {  
+      if (!user) {  
+        window.location.href = 'login.html';  
+        return;  
+      }  
+  
+      const studentRef = db.ref('students/' + user.uid);  
+      studentRef.once('value').then(snapshot => {  
+        const data = snapshot.val();  
+        if (data) {  
+          const firstName = data.fullName?.split(' ')[0] || 'Student';  
+          fullNameEl.textContent = data.fullName || 'N/A';  
+          emailEl.textContent = data.studentEmail || user.email;  
+          courseEl.textContent = data.studentCourse || 'N/A';  
+          numberEl.textContent = data.studentNumber || 'N/A';  
+          statusEl.textContent = data.status || 'Pending';  
+          welcomeText.textContent = `Hi, ${firstName}! Welcome to your homepage.`;  
+          profilePic.src = data.photoURL || 'https://via.placeholder.com/80';  
+        }  
+      });  
+  
+      const msgRef = db.ref('adminMessages/' + user.uid);  
+      msgRef.on('value', snapshot => {  
+        const messages = snapshot.val();  
+        notificationsEl.innerHTML = '';  
+        if (messages) {  
+          Object.values(messages).forEach(msg => {  
+            const li = document.createElement('li');  
+            li.textContent = msg;  
+            notificationsEl.appendChild(li);  
+          });  
+        } else {  
+          notificationsEl.innerHTML = '<li>No messages yet.</li>';  
+        }  
+      });  
+    });  
+  
+    logoutBtn.addEventListener('click', () => {  
+      auth.signOut().then(() => {  
+        window.location.href = 'index.html';  
+      });  
+    });  
+  
+    notifBtn.addEventListener('click', () => {  
+      notifPanel.classList.toggle('active');  
+    });  
+  
+    darkModeToggle.addEventListener('click', () => {  
+      document.body.classList.toggle('dark');  
+    });  
+  
+    feather.replace(); // load icons  
+  </script>  </body>  
+</html>  Do you think it will work here?
+
