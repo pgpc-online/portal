@@ -188,11 +188,12 @@
   });
 
   auth.onAuthStateChanged(async (user) => {
-  if (user) {
+  const onLoginPage = window.location.pathname.includes("login.html"); // adjust based on your actual file name
+
+  if (user && onLoginPage) {
     const email = user.email;
     localStorage.setItem("studentEmail", email);
 
-    // Optional: check if student already submitted application (using Firestore)
     const db = firebase.firestore();
     const doc = await db.collection("studentApplications")
                         .where("email", "==", email)
@@ -200,9 +201,9 @@
                         .get();
 
     if (!doc.empty) {
-      window.location.href = "congrats.html";  // already submitted
+      window.location.href = "congrats.html";
     } else {
-      window.location.href = "form1.html";  // new applicant
+      window.location.href = "form1.html";
     }
   }
 });
