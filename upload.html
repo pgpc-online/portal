@@ -159,6 +159,9 @@
   </div>
 </form>
 
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
@@ -172,61 +175,66 @@
   };
 
   firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+  const auth = firebase.auth();
+  const db = firebase.database();
   const storage = firebase.storage();
 
   document.getElementById("uploadForm").addEventListener("submit", async function (e) {
     e.preventDefault();
     document.getElementById("uploadingMessage").style.display = "block";
 
-    try {
-      // 1. Upload files
-      const photo = document.getElementById("photo").files[0];
-      const psa = document.getElementById("psa").files[0];
-      const goodmoral = document.getElementById("goodmoral").files[0];
-      const brgyPhoto = document.getElementById("brgyPhoto").files[0];
-
-      const uploadFile = async (file, folder) => {
-        const ref = storage.ref(`${folder}/${Date.now()}_${file.name}`);
-        await ref.put(file);
-        return await ref.getDownloadURL();
-      };
-
-      const photoURL = await uploadFile(photo, 'photos');
-      const psaURL = await uploadFile(psa, 'psa');
-      const goodMoralURL = goodmoral ? await uploadFile(goodmoral, 'goodmoral') : null;
-      const brgyPhotoURL = brgyPhoto ? await uploadFile(brgyPhoto, 'barangay') : null;
-
-      // 2. Collect ALL localStorage values into one object
-      const form1and2Data = {};
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        form1and2Data[key] = localStorage.getItem(key);
+    auth.onAuthStateChanged(async user => {
+      if (!user) {
+        alert("User not logged in.");
+        return window.location.href = "login.html";
       }
 
-      // 3. Add file URLs and timestamp to the object
-      const completeData = {
-        ...form1and2Data,
-        photoURL,
-        psaURL,
-        goodMoralURL,
-        brgyPhotoURL,
-        isGarciano: document.querySelector('input[name="isGarciano"]:checked').value,
-        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
+      try {
+        const uid = user.uid;
+        const photo = document.getElementById("photo").files[0];
+        const psa = document.getElementById("psa").files[0];
+        const goodmoral = document.getElementById("goodmoral").files[0];
+        const brgyPhoto = document.getElementById("brgyPhoto").files[0];
 
-      // 4. Save everything to Firestore
-      await db.collection("studentApplications").add(completeData);
+        const uploadFile = async (file, path) => {
+          const ref = storage.ref(`students/${uid}/${path}/${Date.now()}_${file.name}`);
+          await ref.put(file);
+          return await ref.getDownloadURL();
+        };
 
-      alert("All data uploaded successfully!");
-      document.getElementById("uploadForm").reset();
-      localStorage.clear(); // optional: clear storage
-      window.location.href = "congrats.html";
+        const photoURL = await uploadFile(photo, "2x2");
+        const psaURL = await uploadFile(psa, "psa");
+        const goodMoralURL = goodmoral ? await uploadFile(goodmoral, "goodmoral") : null;
+        const brgyPhotoURL = brgyPhoto ? await uploadFile(brgyPhoto, "barangay") : null;
 
-    } catch (error) {
-      console.error("Upload failed:", error);
-      alert("Something went wrong. Please try again.");
-    }
+        const form1and2Data = {};
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          form1and2Data[key] = localStorage.getItem(key);
+        }
+
+        const completeData = {
+          ...form1and2Data,
+          photoURL,
+          psaURL,
+          goodMoralURL,
+          brgyPhotoURL,
+          isGarciano: document.querySelector('input[name="isGarciano"]:checked')?.value || "no",
+          submittedAt: new Date().toISOString()
+        };
+
+        // ✅ Save to Realtime Database using UID
+        await db.ref("students/" + uid).update(completeData);
+
+        alert("All data uploaded successfully!");
+        localStorage.clear();
+        window.location.href = "congrats.html";
+
+      } catch (error) {
+        console.error("Upload failed:", error);
+        alert("Something went wrong. Please try again.");
+      }
+    });
   });
 
   function toggleBarangayUpload() {
