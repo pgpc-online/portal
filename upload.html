@@ -1,180 +1,237 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Upload Documents</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/feather-icons"></script>
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #f9fafb;
-      margin: 0;
-      padding: 2rem;
-      color: #1f2937;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    .upload-container {
-      max-width: 600px;
-      background: white;
-      margin: auto;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-    }
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-    }
-    input[type="file"] {
-      width: 100%;
-    }
-    .btn {
-      background: #2563eb;
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 0.5rem;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .btn:hover {
-      background: #1d4ed8;
-    }
-    .progress-container {
-      margin-top: 1rem;
-    }
-    .progress-bar {
-      width: 100%;
-      background: #e5e7eb;
-      border-radius: 0.5rem;
-      overflow: hidden;
-      height: 20px;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background-color: #2563eb;
-      transition: width 0.3s ease;
-    }
-    .status {
-      margin-top: 0.5rem;
-      font-weight: 500;
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
-  <h1>Upload Your Documents</h1>
-  <div class="upload-container">
-    <form id="uploadForm">
-      <div class="form-group">
-        <label for="document">Choose File(s):</label>
-        <input type="file" id="document" multiple required />
-      </div>
-      <div class="progress-container">
-        <div class="progress-bar">
-          <div class="progress-bar-fill" id="progressBarFill"></div>
-        </div>
-        <div class="status" id="uploadStatus">Waiting for file...</div>
-      </div>
-      <button type="submit" class="btn">Submit</button>
-    </form>
-  </div>
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+  <meta charset="UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>  
+  <title>Student Requirements Upload</title>  
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>  
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>  
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>  
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>  
+  <style>  
+    body {  
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  
+      background: linear-gradient(to bottom right, #e0f7fa, #fce4ec);  
+      display: flex;  
+      justify-content: center;  
+      align-items: center;  
+      min-height: 100vh;  
+      padding: 10px;  
+    }  form {  
+  background: #fff;  
+  padding: 30px;  
+  border-radius: 10px;  
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);  
+  max-width: 600px;  
+  width: 100%;  
+}  
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+h2 {  
+  text-align: center;  
+  color: #00796b;  
+}  
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
-      authDomain: "flipbook-a5350.firebaseapp.com",
-      projectId: "flipbook-a5350",
-      storageBucket: "flipbook-a5350.appspot.com",
-      messagingSenderId: "570378601966",
-      appId: "1:570378601966:web:96ebb77badba7e33107aff"
-    };
-    firebase.initializeApp(firebaseConfig);
+p {  
+  text-align: center;  
+  color: #555;  
+  margin-top: -10px;  
+}  
 
-    const auth = firebase.auth();
-    const storage = firebase.storage();
-    const db = firebase.database();
+ul {  
+  font-size: 14px;  
+  color: green;  
+  margin-top: 10px;  
+  padding-left: 20px;  
+}  
 
-    const uploadForm = document.getElementById('uploadForm');
-    const fileInput = document.getElementById('document');
-    const progressBarFill = document.getElementById('progressBarFill');
-    const uploadStatus = document.getElementById('uploadStatus');
+label {  
+  margin-top: 20px;  
+  font-weight: bold;  
+  display: block;  
+}  
 
-    uploadForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      const files = fileInput.files;
-      if (files.length === 0) {
-        alert('Please select at least one file.');
-        return;
-      }
+input[type="file"] {  
+  margin-top: 5px;  
+  width: 100%;  
+}  
 
-      auth.onAuthStateChanged(user => {
-        if (!user) {
-          alert("You're not logged in. Redirecting to login.");
-          window.location.href = 'login.html';
-          return;
-        }
+.radio-group {  
+  display: flex;  
+  gap: 15px;  
+  margin-top: 10px;  
+}  
 
-        const uploadPromises = [];
-        let uploadedCount = 0;
+button {  
+  margin-top: 20px;  
+  padding: 12px;  
+  background-color: #00796b;  
+  color: white;  
+  border: none;  
+  border-radius: 6px;  
+  font-size: 16px;  
+  cursor: pointer;  
+}  
 
-        Array.from(files).forEach(file => {
-          const storageRef = storage.ref('uploads/' + user.uid + '/' + file.name);
-          const uploadTask = storageRef.put(file);
+button:hover {  
+  background-color: #004d40;  
+}  
 
-          uploadPromises.push(new Promise((resolve, reject) => {
-            uploadTask.on('state_changed',
-              snapshot => {
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                progressBarFill.style.width = `${Math.floor(progress)}%`;
-                uploadStatus.textContent = `Uploading: ${file.name} (${Math.floor(progress)}%)`;
-              },
-              error => {
-                alert('Upload failed: ' + error.message);
-                reject(error);
-              },
-              () => {
-                uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-                  db.ref('studentApplications/' + user.uid + '/uploads').push({
-                    fileName: file.name,
-                    url: downloadURL,
-                    uploadedAt: new Date().toISOString()
-                  });
-                  uploadedCount++;
-                  resolve();
-                });
-              }
-            );
-          }));
-        });
+#progressContainer {  
+  display: none;  
+  margin-top: 15px;  
+}  
 
-        Promise.all(uploadPromises).then(() => {
-          uploadStatus.textContent = 'All files uploaded successfully!';
-          setTimeout(() => {
-            window.location.href = 'congrats.html';
-          }, 2000);
-        }).catch(() => {
-          uploadStatus.textContent = 'Some files failed to upload.';
-        });
-      });
-    });
-  </script>
-</body>
+#progressBar {  
+  width: 100%;  
+  height: 20px;  
+  background: #ccc;  
+  border-radius: 10px;  
+  overflow: hidden;  
+}  
+
+#progressFill {  
+  height: 100%;  
+  width: 0%;  
+  background: #00796b;  
+  transition: width 0.3s;  
+}  
+
+.conditional-upload {  
+  display: none;  
+}
+
+  </style>  
+</head>  
+<body>  
+  <form id="uploadForm">  
+    <h2>Upload Student Requirements</h2>  
+    <p>Please upload the necessary documents.</p>  
+    <ul>  
+      <li>2x2 photo must be clear and recent.</li>  
+      <li>PSA Birth Certificate must be readable.</li>  
+      <li>Good Moral Certificate is optional.</li>  
+    </ul>  <label>Garciano?</label>  
+<div class="radio-group">  
+  <label><input type="radio" name="isGarciano" value="yes" onclick="toggleBarangayUpload()"> Yes</label>  
+  <label><input type="radio" name="isGarciano" value="no" onclick="toggleBarangayUpload()"> No</label>  
+</div>  
+
+<div class="conditional-upload" id="barangayUpload">  
+  <label>Barangay Residency (PDF or Image):</label>  
+  <input type="file" id="brgyPhoto" accept=".pdf,image/*">  
+</div>  
+
+<label>2x2 Photo (JPG/PNG):</label>  
+<input type="file" id="photo" accept="image/*" required>  
+
+<label>PSA Birth Certificate (PDF or Image):</label>  
+<input type="file" id="psa" accept=".pdf,image/*" required>  
+
+<label>Good Moral Certificate (optional):</label>  
+<input type="file" id="goodmoral" accept=".pdf,image/*">  
+
+<button type="submit">Submit</button>  
+
+<div id="progressContainer">  
+  <div id="progressBar">  
+    <div id="progressFill"></div>  
+  </div>  
+</div>
+
+  </form>    <script>  
+    const firebaseConfig = {  
+      apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",  
+      authDomain: "flipbook-a5350.firebaseapp.com",  
+      databaseURL: "https://flipbook-a5350-default-rtdb.firebaseio.com",  
+      projectId: "flipbook-a5350",  
+      storageBucket: "flipbook-a5350.appspot.com",  
+      messagingSenderId: "570378601966",  
+      appId: "1:570378601966:web:96ebb77badba7e33107aff",  
+      measurementId: "G-LCKP7BY0L7"  
+    };  
+  
+    firebase.initializeApp(firebaseConfig);  
+    const auth = firebase.auth();  
+    const db = firebase.database();  
+    const storage = firebase.storage();  
+  
+    document.getElementById("uploadForm").addEventListener("submit", async function (e) {  
+      e.preventDefault();  
+      const progressContainer = document.getElementById("progressContainer");  
+      const progressFill = document.getElementById("progressFill");  
+      progressContainer.style.display = "block";  
+      progressFill.style.width = "0%";  
+  
+      auth.onAuthStateChanged(async user => {  
+        if (!user) {  
+          alert("User not logged in.");  
+          return window.location.href = "login.html";  
+        }  
+  
+        try {  
+          const uid = user.uid;  
+          const photo = document.getElementById("photo").files[0];  
+          const psa = document.getElementById("psa").files[0];  
+          const goodmoral = document.getElementById("goodmoral").files[0];  
+          const brgyPhoto = document.getElementById("brgyPhoto").files[0];  
+          const isGarciano = document.querySelector('input[name="isGarciano"]:checked')?.value || "no";  
+  
+          const uploadFileWithProgress = (file, path) => {  
+            return new Promise((resolve, reject) => {  
+              const ref = storage.ref(`studentApplications/${uid}/${path}/${Date.now()}_${file.name}`);  
+              const uploadTask = ref.put(file);  
+  
+              uploadTask.on('state_changed',  
+                snapshot => {  
+                  const percent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;  
+                  progressFill.style.width = percent.toFixed(0) + "%";  
+                },  
+                error => reject(error),  
+                async () => {  
+                  const url = await uploadTask.snapshot.ref.getDownloadURL();  
+                  resolve(url);  
+                }  
+              );  
+            });  
+          };  
+  
+          const photoURL = await uploadFileWithProgress(photo, "2x2");  
+          const psaURL = await uploadFileWithProgress(psa, "psa");  
+          const goodMoralURL = goodmoral ? await uploadFileWithProgress(goodmoral, "goodmoral") : null;  
+          const brgyPhotoURL = brgyPhoto ? await uploadFileWithProgress(brgyPhoto, "barangay") : null;  
+  
+          const form1and2Data = {};  
+          for (let i = 0; i < localStorage.length; i++) {  
+            const key = localStorage.key(i);  
+            form1and2Data[key] = localStorage.getItem(key);  
+          }  
+  
+          const completeData = {  
+            ...form1and2Data,  
+            photoURL,  
+            psaURL,  
+            goodMoralURL,  
+            brgyPhotoURL,  
+            isGarciano,  
+            submittedAt: new Date().toISOString()  
+          };  
+  
+          await db.ref("studentApplications/" + uid).update(completeData);  
+  
+          alert("All files uploaded successfully!");  
+          localStorage.clear();  
+          window.location.href = "congrats.html";  
+  
+        } catch (error) {  
+          console.error("Upload error:", error);  
+          alert("Something went wrong. Please try again.");  
+        }  
+      });  
+    });  
+  
+    function toggleBarangayUpload() {  
+      const isGarciano = document.querySelector('input[name="isGarciano"]:checked');  
+      const section = document.getElementById("barangayUpload");  
+      section.style.display = isGarciano && isGarciano.value === "yes" ? "block" : "none";  
+    }  
+  </script>  </body>  
 </html>
