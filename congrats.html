@@ -1,84 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Student Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welcome Student</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f3f4f6;
-      color: #1f2937;
-      margin: 0;
-      padding: 2rem;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f8ff;
+      padding: 20px;
+      text-align: center;
     }
+
     .container {
       max-width: 600px;
+      background: white;
       margin: auto;
-      background: #ffffff;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     }
-    h1 {
-      text-align: center;
-      color: #2563eb;
-    }
-    .info-item {
-      margin: 1rem 0;
-    }
-    .info-item strong {
-      display: inline-block;
+
+    img {
       width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 15px;
+    }
+
+    h2 {
+      color: #00796b;
+    }
+
+    .info {
+      text-align: left;
+      margin-top: 20px;
+    }
+
+    .info p {
+      margin: 6px 0;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #004d40;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Welcome to PGPC Portal!</h1>
-    <div class="info-item"><strong>Full Name:</strong> <span id="fullName">Loading...</span></div>
-    <div class="info-item"><strong>Email:</strong> <span id="email">Loading...</span></div>
-    <div class="info-item"><strong>Phone:</strong> <span id="phone">Loading...</span></div>
-    <div class="info-item"><strong>Status:</strong> <span id="status">Loading...</span></div>
+    <img id="profilePic" src="" alt="2x2 Photo">
+    <h2 id="welcomeText">Welcome, Student</h2>
+    <div class="info" id="studentInfo"></div>
+    <button onclick="logout()">Logout</button>
   </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
       authDomain: "flipbook-a5350.firebaseapp.com",
+      databaseURL: "https://flipbook-a5350-default-rtdb.firebaseio.com",
       projectId: "flipbook-a5350",
       storageBucket: "flipbook-a5350.appspot.com",
       messagingSenderId: "570378601966",
       appId: "1:570378601966:web:96ebb77badba7e33107aff"
     };
+
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
 
     auth.onAuthStateChanged(user => {
       if (!user) {
-        window.location.href = 'login.html';
+        alert("You are not logged in.");
+        window.location.href = "login.html";
         return;
       }
 
-      const userRef = db.ref('studentApplications/' + user.uid);
-      userRef.once('value').then(snapshot => {
+      const uid = user.uid;
+      db.ref("studentApplications/" + uid).once("value").then(snapshot => {
         const data = snapshot.val();
-        if (data) {
-          document.getElementById('fullName').textContent = `${data.firstName || 'N/A'} ${data.lastName || ''}`;
-          document.getElementById('email').textContent = data.email || user.email;
-          document.getElementById('phone').textContent = data.phone || 'N/A';
-          document.getElementById('status').textContent = data.status || 'Pending';
-        } else {
-          alert("Student record not found.");
+        if (!data) return;
+
+        const firstName = data.firstName || "";
+        const lastName = data.lastName || "";
+        const photoURL = data.photoURL || "";
+
+        document.getElementById("welcomeText").innerText = `Welcome, ${firstName} ${lastName}`;
+        document.getElementById("profilePic").src = photoURL;
+
+        const infoDiv = document.getElementById("studentInfo");
+        let html = "";
+
+        for (const key in data) {
+          if (key === "photoURL" || key === "submittedAt") continue;
+          html += `<p><strong>${key}:</strong> ${data[key]}</p>`;
         }
+
+        infoDiv.innerHTML = html;
+      }).catch(err => {
+        console.error("Failed to fetch data:", err);
+        alert("Unable to load your information.");
       });
     });
+
+    function logout() {
+      firebase.auth().signOut().then(() => {
+        window.location.href = "login.html";
+      });
+    }
   </script>
 </body>
 </html>
