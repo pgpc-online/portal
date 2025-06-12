@@ -186,12 +186,25 @@
     }
   });
 
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      localStorage.setItem("studentEmail", user.email);
-      window.location.href = "form1.html";
+  auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    const email = user.email;
+    localStorage.setItem("studentEmail", email);
+
+    // Optional: check if student already submitted application (using Firestore)
+    const db = firebase.firestore();
+    const doc = await db.collection("studentApplications")
+                        .where("email", "==", email)
+                        .limit(1)
+                        .get();
+
+    if (!doc.empty) {
+      window.location.href = "student-home.html";  // already submitted
+    } else {
+      window.location.href = "form1.html";  // new applicant
     }
-  });
+  }
+});
 
   function togglePassword() {
     const input = document.getElementById("password");
