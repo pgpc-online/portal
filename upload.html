@@ -213,13 +213,18 @@
     studentRef.once('value').then(snapshot => {
       const data = snapshot.val();
       if (data) {
-        const firstName = data.fullName?.split(' ')[0] || 'Student';
-        fullNameEl.textContent = data.fullName || 'N/A';
+        const firstName = data.firstName || 'Student';
+const middleName = data.middleName || '';
+const lastName = data.lastName || '';
+const fullName = `${firstName} ${middleName} ${lastName}`.trim().replace(/\s+/g, ' ');
+
+fullNameEl.textContent = fullName;
+welcomeText.textContent = `Hi, ${firstName}! Welcome to your homepage.`;
         emailEl.textContent = data.studentEmail || user.email;
         courseEl.textContent = data.studentCourse || 'N/A';
         numberEl.textContent = data.studentNumber || 'N/A';
         statusEl.textContent = data.status || 'Pending';
-        welcomeText.textContent = `Hi, ${firstName}! Welcome to your homepage.`;
+        
         profilePic.src = data.photoURL || 'https://via.placeholder.com/80';
       }
     });
