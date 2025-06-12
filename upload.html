@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Student Requirements Upload</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <style>
     body {
@@ -31,7 +32,7 @@
 
     h2 {
       text-align: center;
-      color: #00796b;
+      color: #274ce0;
       margin-bottom: 20px;
     }
 
@@ -52,7 +53,7 @@
     label {
       margin-top: 20px;
       font-weight: bold;
-      display: block; /* Ensures labels are block elements */
+      display: block;
     }
 
     input[type="file"], input[type="radio"] {
@@ -67,13 +68,13 @@
     .radio-group {
       margin-top: 10px;
       display: flex;
-     /* flex-direction: column;  Stack radio buttons vertically */
+      gap: 20px;
     }
 
     button {
       margin-top: 20px;
       padding: 12px;
-      background-color: #00796b;
+      background-color: #274ce0;
       color: white;
       font-size: 16px;
       font-weight: bold;
@@ -101,7 +102,7 @@
     }
 
     .conditional-upload {
-      display: none; /* Hidden by default */
+      display: none;
     }
 
     @media (max-width: 480px) {
@@ -137,7 +138,7 @@
     <label><input type="radio" name="isGarciano" value="no" onclick="toggleBarangayUpload()"> No</label>
   </div>
   <hr>
- 
+
   <div class="conditional-upload" id="barangayUpload">
     <label>Barangay Residency Document (PDF or Image):</label>
     <input type="file" id="brgyPhoto" accept=".pdf,image/*">
@@ -154,13 +155,8 @@
 
   <button type="submit">Submit</button>
 
-  <div id="uploadingMessage">
-    Uploading... This may take a few moments. Please wait.
-  </div>
+  <div id="uploadingMessage">Uploading... This may take a few moments. Please wait.</div>
 </form>
-
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
 <script>
   const firebaseConfig = {
@@ -183,58 +179,61 @@
     e.preventDefault();
     document.getElementById("uploadingMessage").style.display = "block";
 
-    auth.onAuthStateChanged(async user => {
-      if (!user) {
-        alert("User not logged in.");
-        return window.location.href = "login.html";
+    const user = auth.currentUser;
+    if (!user) {
+      alert("User not logged in.");
+      return window.location.href = "login.html";
+    }
+
+    try {
+      const uid = user.uid;
+      const photo = document.getElementById("photo").files[0];
+      const psa = document.getElementById("psa").files[0];
+      const goodmoral = document.getElementById("goodmoral").files[0];
+      const brgyPhoto = document.getElementById("brgyPhoto").files[0];
+
+      if (!photo || !psa) {
+        alert("Please upload the required 2x2 photo and PSA certificate.");
+        return;
       }
 
-      try {
-        const uid = user.uid;
-        const photo = document.getElementById("photo").files[0];
-        const psa = document.getElementById("psa").files[0];
-        const goodmoral = document.getElementById("goodmoral").files[0];
-        const brgyPhoto = document.getElementById("brgyPhoto").files[0];
+      const uploadFile = async (file, path) => {
+        const ref = storage.ref(`students/${uid}/${path}/${Date.now()}_${file.name}`);
+        await ref.put(file);
+        return await ref.getDownloadURL();
+      };
 
-        const uploadFile = async (file, path) => {
-          const ref = storage.ref(`students/${uid}/${path}/${Date.now()}_${file.name}`);
-          await ref.put(file);
-          return await ref.getDownloadURL();
-        };
+      const photoURL = await uploadFile(photo, "2x2");
+      const psaURL = await uploadFile(psa, "psa");
+      const goodMoralURL = goodmoral ? await uploadFile(goodmoral, "goodmoral") : null;
+      const brgyPhotoURL = brgyPhoto ? await uploadFile(brgyPhoto, "barangay") : null;
 
-        const photoURL = await uploadFile(photo, "2x2");
-        const psaURL = await uploadFile(psa, "psa");
-        const goodMoralURL = goodmoral ? await uploadFile(goodmoral, "goodmoral") : null;
-        const brgyPhotoURL = brgyPhoto ? await uploadFile(brgyPhoto, "barangay") : null;
-
-        const form1and2Data = {};
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          form1and2Data[key] = localStorage.getItem(key);
-        }
-
-        const completeData = {
-          ...form1and2Data,
-          photoURL,
-          psaURL,
-          goodMoralURL,
-          brgyPhotoURL,
-          isGarciano: document.querySelector('input[name="isGarciano"]:checked')?.value || "no",
-          submittedAt: new Date().toISOString()
-        };
-
-        // ✅ Save to Realtime Database using UID
-        await db.ref("students/" + uid).update(completeData);
-
-        alert("All data uploaded successfully!");
-        localStorage.clear();
-        window.location.href = "congrats.html";
-
-      } catch (error) {
-        console.error("Upload failed:", error);
-        alert("Something went wrong. Please try again.");
+      const form1and2Data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        form1and2Data[key] = localStorage.getItem(key);
       }
-    });
+
+      const completeData = {
+        ...form1and2Data,
+        photoURL,
+        psaURL,
+        goodMoralURL,
+        brgyPhotoURL,
+        isGarciano: document.querySelector('input[name="isGarciano"]:checked')?.value || "no",
+        submittedAt: new Date().toISOString()
+      };
+
+      await db.ref("students/" + uid).update(completeData);
+
+      alert("All data uploaded successfully!");
+      localStorage.clear();
+      window.location.href = "congrats.html";
+
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("Something went wrong. Please try again.");
+    }
   });
 
   function toggleBarangayUpload() {
@@ -242,6 +241,9 @@
     const isGarciano = document.querySelector('input[name="isGarciano"]:checked');
     barangayUpload.style.display = isGarciano && isGarciano.value === "yes" ? "block" : "none";
   }
+
+  window.addEventListener("DOMContentLoaded", toggleBarangayUpload);
 </script>
+
 </body>
 </html>
