@@ -1,199 +1,218 @@
-<!DOCTYPE html>  <html lang="en">  
-<head>  
-  <meta charset="UTF-8" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>  
-  <title>Student Requirements Upload</title>  
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>  
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>  
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>  
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>  
-  <style>  
-    body {  
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  
-      background: linear-gradient(to bottom right, #e0f7fa, #fce4ec);  
-      display: flex;  
-      justify-content: center;  
-      align-items: center;  
-      min-height: 100vh;  
-      padding: 10px;  
-    }  form {  
-  background: #fff;  
-  padding: 30px;  
-  border-radius: 10px;  
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);  
-  max-width: 600px;  
-  width: 100%;  
-}  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Requirements Upload</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom right, #e0f7fa, #fce4ec);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 10px;
+    }
+    form {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      width: 100%;
+    }
+    h2 {
+      text-align: center;
+      color: #0047AB;
+    }
+    p {
+      text-align: center;
+      color: #555;
+      margin-top: -10px;
+    }
+    ul {
+      font-size: 14px;
+      color: green;
+      margin-top: 10px;
+      padding-left: 20px;
+    }
+    label {
+      margin-top: 20px;
+      font-weight: bold;
+      display: block;
+    }
+    input[type="file"] {
+      margin-top: 5px;
+      width: 100%;
+    }
+    .radio-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      background-color: #0047AB;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #004d40;
+    }
+    .conditional-upload {
+      display: none;
+    }
+    #statusMessage {
+      text-align: center;
+      color: #00796b;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <form id="uploadForm">
+    <h2>Upload Student Requirements</h2>
+    <p>Please upload the necessary documents.</p>
+    <ul>
+      <li>2x2 photo must be clear and recent.</li>
+      <li>PSA Birth Certificate must be readable.</li>
+      <li>Good Moral Certificate is optional.</li>
+    </ul>
 
-h2 {  
-  text-align: center;  
-  color: #00796b;  
-}  
+    <label>Garciano?</label>
+    <div class="radio-group">
+      <label><input type="radio" name="isGarciano" value="yes" onclick="toggleBarangayUpload()"> Yes</label>
+      <label><input type="radio" name="isGarciano" value="no" onclick="toggleBarangayUpload()"> No</label>
+    </div>
 
-p {  
-  text-align: center;  
-  color: #555;  
-  margin-top: -10px;  
-}  
+    <div class="conditional-upload" id="barangayUpload">
+      <label>Barangay Residency (PDF or Image):</label>
+      <input type="file" id="brgyPhoto" accept=".pdf,image/*">
+    </div>
 
-ul {  
-  font-size: 14px;  
-  color: green;  
-  margin-top: 10px;  
-  padding-left: 20px;  
-}  
+    <label>2x2 Photo (JPG/PNG):</label>
+    <input type="file" id="photo" accept="image/*" required>
 
-label {  
-  margin-top: 20px;  
-  font-weight: bold;  
-  display: block;  
-}  
+    <label>PSA Birth Certificate (PDF or Image):</label>
+    <input type="file" id="psa" accept=".pdf,image/*" required>
 
-input[type="file"] {  
-  margin-top: 5px;  
-  width: 100%;  
-}  
+    <label>Good Moral Certificate (optional):</label>
+    <input type="file" id="goodmoral" accept=".pdf,image/*">
 
-.radio-group {  
-  display: flex;  
-  gap: 15px;  
-  margin-top: 10px;  
-}  
+    <button type="submit">Submit</button>
 
-button {  
-  margin-top: 20px;  
-  padding: 12px;  
-  background-color: #00796b;  
-  color: white;  
-  border: none;  
-  border-radius: 6px;  
-  font-size: 16px;  
-  cursor: pointer;  
-}  
+    <p id="statusMessage"></p>
+  </form>
 
-button:hover {  
-  background-color: #004d40;  
-}  
+  <script>
+    function toggleBarangayUpload() {
+      const selected = document.querySelector('input[name="isGarciano"]:checked')?.value;
+      const barangayDiv = document.getElementById("barangayUpload");
+      barangayDiv.style.display = (selected === "yes") ? "block" : "none";
+    }
 
+    window.addEventListener("DOMContentLoaded", toggleBarangayUpload);
+  </script>
 
-.conditional-upload {  
-  display: none;  
-}
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
+      authDomain: "flipbook-a5350.firebaseapp.com",
+      databaseURL: "https://flipbook-a5350-default-rtdb.firebaseio.com",
+      projectId: "flipbook-a5350",
+      storageBucket: "flipbook-a5350.appspot.com",
+      messagingSenderId: "570378601966",
+      appId: "1:570378601966:web:96ebb77badba7e33107aff",
+      measurementId: "G-LCKP7BY0L7"
+    };
 
-  </style>  
-</head>  
-<body>  
-  <form id="uploadForm">  
-    <h2>Upload Student Requirements</h2>  
-    <p>Please upload the necessary documents.</p>  
-    <ul>  
-      <li>2x2 photo must be clear and recent.</li>  
-      <li>PSA Birth Certificate must be readable.</li>  
-      <li>Good Moral Certificate is optional.</li>  
-    </ul>  <label>Garciano?</label>  
-<div class="radio-group">  
-  <label><input type="radio" name="isGarciano" value="yes" onclick="toggleBarangayUpload()"> Yes</label>  
-  <label><input type="radio" name="isGarciano" value="no" onclick="toggleBarangayUpload()"> No</label>  
-</div>  
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    const storage = firebase.storage();
 
-<div class="conditional-upload" id="barangayUpload">  
-  <label>Barangay Residency (PDF or Image):</label>  
-  <input type="file" id="brgyPhoto" accept=".pdf,image/*">  
-</div>  
-
-<label>2x2 Photo (JPG/PNG):</label>  
-<input type="file" id="photo" accept="image/*" required>  
-
-<label>PSA Birth Certificate (PDF or Image):</label>  
-<input type="file" id="psa" accept=".pdf,image/*" required>  
-
-<label>Good Moral Certificate (optional):</label>  
-<input type="file" id="goodmoral" accept=".pdf,image/*">  
-
-<button type="submit">Submit</button>  
-
-<!-- Add inside <form> just before the closing </form> -->
-<p id="statusMessage" style="text-align: center; color: #00796b; font-weight: bold; margin-top: 20px;"></p>
-
-  </form>    <script>  
-    const firebaseConfig = {  
-      apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",  
-      authDomain: "flipbook-a5350.firebaseapp.com",  
-      databaseURL: "https://flipbook-a5350-default-rtdb.firebaseio.com",  
-      projectId: "flipbook-a5350",  
-      storageBucket: "flipbook-a5350.appspot.com",  
-      messagingSenderId: "570378601966",  
-      appId: "1:570378601966:web:96ebb77badba7e33107aff",  
-      measurementId: "G-LCKP7BY0L7"  
-    };  
-  
-    firebase.initializeApp(firebaseConfig);  
-    const auth = firebase.auth();  
-    const db = firebase.database();  
-    const storage = firebase.storage();  
-  
     document.getElementById("uploadForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
-  const statusMessage = document.getElementById("statusMessage");
-  statusMessage.textContent = "Starting upload...";
+      e.preventDefault();
+      const statusMessage = document.getElementById("statusMessage");
+      statusMessage.textContent = "Starting upload...";
 
-  auth.onAuthStateChanged(async user => {
-    if (!user) {
-      alert("User not logged in.");
-      return window.location.href = "login.html";
-    }
+      auth.onAuthStateChanged(async user => {
+        if (!user) {
+          alert("User not logged in.");
+          return window.location.href = "login.html";
+        }
 
-    try {
-      const uid = user.uid;
-      const photo = document.getElementById("photo").files[0];
-      const psa = document.getElementById("psa").files[0];
-      const goodmoral = document.getElementById("goodmoral").files[0];
-      const brgyPhoto = document.getElementById("brgyPhoto").files[0];
-      const isGarciano = document.querySelector('input[name="isGarciano"]:checked')?.value || "no";
+        try {
+          const uid = user.uid;
+          const photo = document.getElementById("photo").files[0];
+          const psa = document.getElementById("psa").files[0];
+          const goodmoral = document.getElementById("goodmoral").files[0];
+          const brgyPhoto = document.getElementById("brgyPhoto").files[0];
+          const isGarciano = document.querySelector('input[name="isGarciano"]:checked')?.value || "no";
 
-      const uploadFileWithStatus = async (file, path, label) => {
-        if (!file) return null;
-        statusMessage.textContent = `Uploading ${label}...`;
-        const ref = storage.ref(`studentApplications/${uid}/${path}/${Date.now()}_${file.name}`);
-        await ref.put(file);
-        statusMessage.textContent = `${label} uploaded!`;
-        return await ref.getDownloadURL();
-      };
+          const uploadFileWithStatus = async (file, path, label) => {
+            if (!file) return null;
+            statusMessage.textContent = `Uploading ${label}...`;
+            const ref = storage.ref(`studentApplications/${uid}/${path}/${Date.now()}_${file.name}`);
+            await ref.put(file);
+            statusMessage.textContent = `${label} uploaded!`;
+            return await ref.getDownloadURL();
+          };
 
-      const photoURL = await uploadFileWithStatus(photo, "2x2", "2x2 Photo");
-      const psaURL = await uploadFileWithStatus(psa, "psa", "PSA Birth Certificate");
-      const goodMoralURL = await uploadFileWithStatus(goodmoral, "goodmoral", "Good Moral Certificate");
-      const brgyPhotoURL = await uploadFileWithStatus(brgyPhoto, "barangay", "Barangay Residency");
+          const photoURL = await uploadFileWithStatus(photo, "2x2", "2x2 Photo");
+          const psaURL = await uploadFileWithStatus(psa, "psa", "PSA Birth Certificate");
+          const goodMoralURL = await uploadFileWithStatus(goodmoral, "goodmoral", "Good Moral Certificate");
 
-      const form1and2Data = {};
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        form1and2Data[key] = localStorage.getItem(key);
-      }
+          let brgyPhotoURL = null;
+          if (isGarciano === "yes" && brgyPhoto) {
+            brgyPhotoURL = await uploadFileWithStatus(brgyPhoto, "barangay", "Barangay Residency");
+          }
 
-      const completeData = {
-        ...form1and2Data,
-        photoURL,
-        psaURL,
-        goodMoralURL,
-        brgyPhotoURL,
-        isGarciano,
-        submittedAt: new Date().toISOString()
-      };
+          const form1and2Data = {};
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (!key.startsWith("firebase:")) {
+              form1and2Data[key] = localStorage.getItem(key);
+            }
+          }
 
-      statusMessage.textContent = "Saving your data to database...";
-      await db.ref("studentApplications/" + uid).update(completeData);
+          const completeData = {
+            ...form1and2Data,
+            photoURL,
+            psaURL,
+            goodMoralURL,
+            isGarciano,
+            submittedAt: new Date().toISOString()
+          };
 
-      statusMessage.textContent = "All files uploaded and data saved!";
-      localStorage.clear();
-      setTimeout(() => window.location.href = "congrats.html", 1000);
+          if (brgyPhotoURL) {
+            completeData.brgyPhotoURL = brgyPhotoURL;
+          }
 
-    } catch (error) {
-      console.error("Upload error:", error);
-      statusMessage.textContent = "Error occurred. Please try again.";
-      alert("Something went wrong. Please try again.");
-    }
-  });
-});
-  </script>  </body>  
+          statusMessage.textContent = "Saving your data to database...";
+          await db.ref("studentApplications/" + uid).update(completeData);
+
+          statusMessage.textContent = "All files uploaded and data saved!";
+          localStorage.clear();
+          setTimeout(() => window.location.href = "congrats.html", 1500);
+
+        } catch (error) {
+          console.error("Upload error:", error);
+          statusMessage.textContent = "Error occurred. Please try again.";
+          alert("Something went wrong. Please try again.");
+        }
+      });
+    });
+  </script>
+</body>
 </html>
