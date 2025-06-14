@@ -108,7 +108,7 @@
       auth.onAuthStateChanged(async user => {
         if (!user) {
           alert("Not logged in. Redirecting to login page.");
-          return location.href = "login.html";
+          return location.href = "student-login.html";
         }
 
         try {
@@ -145,7 +145,7 @@
 
           statusMsg.textContent = "✅ All data submitted successfully!";
           localStorage.clear();
-          setTimeout(() => location.href = "congrats.html", 1500);
+          setTimeout(() => location.href = "student-portal.html", 1500);
         } catch (error) {
           console.error(error);
           statusMsg.textContent = "❌ Error: " + error.message;
