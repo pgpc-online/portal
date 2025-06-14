@@ -75,25 +75,6 @@ button:hover {
   background-color: #004d40;  
 }  
 
-#progressContainer {  
-  display: none;  
-  margin-top: 15px;  
-}  
-
-#progressBar {  
-  width: 100%;  
-  height: 20px;  
-  background: #ccc;  
-  border-radius: 10px;  
-  overflow: hidden;  
-}  
-
-#progressFill {  
-  height: 100%;  
-  width: 0%;  
-  background: #00796b;  
-  transition: width 0.3s;  
-}  
 
 .conditional-upload {  
   display: none;  
@@ -131,11 +112,8 @@ button:hover {
 
 <button type="submit">Submit</button>  
 
-<div id="progressContainer">  
-  <div id="progressBar">  
-    <div id="progressFill"></div>  
-  </div>  
-</div>
+<!-- Add inside <form> just before the closing </form> -->
+<p id="statusMessage" style="text-align: center; color: #00796b; font-weight: bold; margin-top: 20px;"></p>
 
   </form>    <script>  
     const firebaseConfig = {  
@@ -154,84 +132,68 @@ button:hover {
     const db = firebase.database();  
     const storage = firebase.storage();  
   
-    document.getElementById("uploadForm").addEventListener("submit", async function (e) {  
-      e.preventDefault();  
-      const progressContainer = document.getElementById("progressContainer");  
-      const progressFill = document.getElementById("progressFill");  
-      progressContainer.style.display = "block";  
-      progressFill.style.width = "0%";  
-  
-      auth.onAuthStateChanged(async user => {  
-        if (!user) {  
-          alert("User not logged in.");  
-          return window.location.href = "login.html";  
-        }  
-  
-        try {  
-          const uid = user.uid;  
-          const photo = document.getElementById("photo").files[0];  
-          const psa = document.getElementById("psa").files[0];  
-          const goodmoral = document.getElementById("goodmoral").files[0];  
-          const brgyPhoto = document.getElementById("brgyPhoto").files[0];  
-          const isGarciano = document.querySelector('input[name="isGarciano"]:checked')?.value || "no";  
-  
-          const uploadFileWithProgress = (file, path) => {  
-            return new Promise((resolve, reject) => {  
-              const ref = storage.ref(`studentApplications/${uid}/${path}/${Date.now()}_${file.name}`);  
-              const uploadTask = ref.put(file);  
-  
-              uploadTask.on('state_changed',  
-                snapshot => {  
-                  const percent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;  
-                  progressFill.style.width = percent.toFixed(0) + "%";  
-                },  
-                error => reject(error),  
-                async () => {  
-                  const url = await uploadTask.snapshot.ref.getDownloadURL();  
-                  resolve(url);  
-                }  
-              );  
-            });  
-          };  
-  
-          const photoURL = await uploadFileWithProgress(photo, "2x2");  
-          const psaURL = await uploadFileWithProgress(psa, "psa");  
-          const goodMoralURL = goodmoral ? await uploadFileWithProgress(goodmoral, "goodmoral") : null;  
-          const brgyPhotoURL = brgyPhoto ? await uploadFileWithProgress(brgyPhoto, "barangay") : null;  
-  
-          const form1and2Data = {};  
-          for (let i = 0; i < localStorage.length; i++) {  
-            const key = localStorage.key(i);  
-            form1and2Data[key] = localStorage.getItem(key);  
-          }  
-  
-          const completeData = {  
-            ...form1and2Data,  
-            photoURL,  
-            psaURL,  
-            goodMoralURL,  
-            brgyPhotoURL,  
-            isGarciano,  
-            submittedAt: new Date().toISOString()  
-          };  
-  
-          await db.ref("studentApplications/" + uid).update(completeData);  
-  
-          alert("All files uploaded successfully!");  
-          localStorage.clear();  
-          window.location.href = "congrats.html";  
-  
-        } catch (error) {  
-          console.error("Upload error:", error);  
-          alert("Something went wrong. Please try again.");  
-        }  
-      });  
-    });  
-  
-    function toggleBarangayUpload() {  
-      const isGarciano = document.querySelector('input[name="isGarciano"]:checked');  
-      const section = document.getElementById("barangayUpload");  
-      section.style.display = isGarciano && isGarciano.value === "yes" ? "block" : "none";  
-    }  
+    document.getElementById("uploadForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+  const statusMessage = document.getElementById("statusMessage");
+  statusMessage.textContent = "Starting upload...";
+
+  auth.onAuthStateChanged(async user => {
+    if (!user) {
+      alert("User not logged in.");
+      return window.location.href = "login.html";
+    }
+
+    try {
+      const uid = user.uid;
+      const photo = document.getElementById("photo").files[0];
+      const psa = document.getElementById("psa").files[0];
+      const goodmoral = document.getElementById("goodmoral").files[0];
+      const brgyPhoto = document.getElementById("brgyPhoto").files[0];
+      const isGarciano = document.querySelector('input[name="isGarciano"]:checked')?.value || "no";
+
+      const uploadFileWithStatus = async (file, path, label) => {
+        if (!file) return null;
+        statusMessage.textContent = `Uploading ${label}...`;
+        const ref = storage.ref(`studentApplications/${uid}/${path}/${Date.now()}_${file.name}`);
+        await ref.put(file);
+        statusMessage.textContent = `${label} uploaded!`;
+        return await ref.getDownloadURL();
+      };
+
+      const photoURL = await uploadFileWithStatus(photo, "2x2", "2x2 Photo");
+      const psaURL = await uploadFileWithStatus(psa, "psa", "PSA Birth Certificate");
+      const goodMoralURL = await uploadFileWithStatus(goodmoral, "goodmoral", "Good Moral Certificate");
+      const brgyPhotoURL = await uploadFileWithStatus(brgyPhoto, "barangay", "Barangay Residency");
+
+      const form1and2Data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        form1and2Data[key] = localStorage.getItem(key);
+      }
+
+      const completeData = {
+        ...form1and2Data,
+        photoURL,
+        psaURL,
+        goodMoralURL,
+        brgyPhotoURL,
+        isGarciano,
+        submittedAt: new Date().toISOString()
+      };
+
+      statusMessage.textContent = "Saving your data to database...";
+      await db.ref("studentApplications/" + uid).update(completeData);
+
+      statusMessage.textContent = "All files uploaded and data saved!";
+      localStorage.clear();
+      setTimeout(() => window.location.href = "congrats.html", 1000);
+
+    } catch (error) {
+      console.error("Upload error:", error);
+      statusMessage.textContent = "Error occurred. Please try again.";
+      alert("Something went wrong. Please try again.");
+    }
+  });
+});
   </script>  </body>  
 </html>
