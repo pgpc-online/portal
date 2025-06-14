@@ -6,10 +6,25 @@
   <title>Student Login</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
+    :root {
+      --bg: #f0f2f5;
+      --text: #111;
+      --card: #fff;
+      --primary: #3f51b5;
+    }
+    [data-theme="dark"] {
+      --bg: #121212;
+      --text: #fff;
+      --card: #1e1e1e;
+      --primary: #90caf9;
+    }
+
     * { box-sizing: border-box; }
     body {
+      background: var(--bg);
+      color: var(--text);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
@@ -17,59 +32,93 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
-      background: #f0f2f5;
+      transition: background 0.3s, color 0.3s;
     }
     .card {
-      background: #fff;
+      background: var(--card);
       padding: 40px 30px;
       width: 100%;
       max-width: 400px;
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       opacity: 0;
-      animation: fadeIn 1s forwards 1s;
+      animation: fadeIn 1s forwards 0.5s;
     }
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
-    .card h2 { text-align: center; margin-bottom: 20px; color: #3f51b5; }
+    .card h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: var(--primary);
+    }
     .card input {
       width: 100%; padding: 12px; margin: 10px 0;
       border-radius: 8px; border: 1px solid #ccc;
       font-size: 16px;
+      background: transparent;
+      color: var(--text);
     }
-    .card input:focus { border-color: #3f51b5; outline: none; }
+    .card input:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
     .card button {
-      width: 100%; background: #3f51b5; color: white;
+      width: 100%; background: var(--primary); color: white;
       border: none; padding: 12px; margin-top: 10px;
       border-radius: 8px; font-size: 16px;
       cursor: pointer;
     }
-    .card button:hover { background: #303f9f; }
-    #switch {
-      margin-top: 15px; text-align: center;
-      font-size: 14px; color: #3f51b5; cursor: pointer;
+    .card button:hover {
+      background: #303f9f;
+    }
+    .card small {
+      display: block;
+      margin-top: 15px;
+      text-align: center;
+      color: var(--primary);
+      cursor: pointer;
     }
     #errorMsg {
-      margin-top: 15px; color: #e53935;
-      text-align: center; font-size: 14px;
+      color: red;
+      margin-top: 10px;
+      text-align: center;
+      font-size: 14px;
     }
-    .password-wrapper { position: relative; }
-    .password-wrapper input { padding-right: 40px; }
     .toggle-password {
-      position: absolute; right: 12px; top: 50%;
+      position: absolute;
+      right: 12px;
+      top: 50%;
       transform: translateY(-50%);
-      cursor: pointer; font-size: 18px;
-      color: #777; user-select: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: #777;
+      user-select: none;
     }
-    .toggle-password:hover { color: #3f51b5; }
+    .toggle-password:hover {
+      color: var(--primary);
+    }
+    .password-wrapper {
+      position: relative;
+    }
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--primary);
+    }
   </style>
 </head>
 <body>
 
+<button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+
 <div class="card">
-<!--<img src="pgpc.png"alt="logo"height="50" width="50"/>-->
   <h2 id="formTitle">Student Login</h2>
   <form id="authForm">
     <input type="email" id="email" placeholder="Enter your email" required />
@@ -78,17 +127,12 @@
       <span class="toggle-password" onclick="togglePassword()">👁️</span>
     </div>
     <button type="submit" id="submitBtn">Login</button>
-    <div id="switch">Don't have an account? Register here</div>
+    <small id="switch">Don't have an account? Register here</small>
     <div id="errorMsg"></div>
   </form>
 </div>
 
 <script>
-  // 👇 Prevent iframe embedding to allow Firebase Auth visibility check
-  if (window.top !== window.self) {
-    window.top.location = window.self.location;
-  }
-
   const firebaseConfig = {
     apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
     authDomain: "flipbook-a5350.firebaseapp.com",
@@ -102,7 +146,7 @@
 
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
-  const db = firebase.firestore();
+  const db = firebase.database();
 
   const form = document.getElementById("authForm");
   const emailInput = document.getElementById("email");
@@ -126,8 +170,8 @@
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = emailInput.value;
-    const password = passwordInput.value;
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
 
     try {
       if (isLogin) {
@@ -135,28 +179,28 @@
       } else {
         await auth.createUserWithEmailAndPassword(email, password);
       }
-
       localStorage.setItem("studentEmail", email);
     } catch (error) {
       errorMsg.textContent = error.message;
     }
   });
 
-  auth.onAuthStateChanged(async (user) => {
-    if (!user) return;
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      const email = user.email;
+      localStorage.setItem("studentEmail", email);
 
-    const email = user.email;
-    localStorage.setItem("studentEmail", email);
-
-    const snapshot = await db.collection("studentApplications")
-      .where("email", "==", email)
-      .limit(1)
-      .get();
-
-    if (!snapshot.empty) {
-      window.location.href = "congrats.html";
-    } else {
-      window.location.href = "form1.html";
+      // Check if the student's data exists in Realtime Database
+      db.ref("studentApplications")
+        .orderByChild("email")
+        .equalTo(email)
+        .once("value", snapshot => {
+          if (snapshot.exists()) {
+            window.location.href = "student-portal.html";
+          } else {
+            window.location.href = "PGPCform.html";
+          }
+        });
     }
   });
 
@@ -171,6 +215,21 @@
       icon.textContent = "👁️";
     }
   }
+
+  function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute("data-theme");
+    if (currentTheme === "dark") {
+      document.documentElement.setAttribute("data-theme", "light");
+      localStorage.setItem("theme", "light");
+    } else {
+      document.documentElement.setAttribute("data-theme", "dark");
+      localStorage.setItem("theme", "dark");
+    }
+  }
+
+  // Load saved theme
+  const savedTheme = localStorage.getItem("theme") || "light";
+  document.documentElement.setAttribute("data-theme", savedTheme);
 </script>
 
 </body>
