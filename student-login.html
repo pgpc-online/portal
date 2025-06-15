@@ -133,6 +133,7 @@
 </div>
 
 <script>
+  // Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
     authDomain: "flipbook-a5350.firebaseapp.com",
@@ -169,49 +170,57 @@
   });
 
   form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
+    e.preventDefault();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
 
-  try {
-    if (isLogin) {
-      await auth.signInWithEmailAndPassword(email, password);
-      errorMsg.style.color = "green";
-      errorMsg.textContent = "✅ Login successful! Redirecting...";
-    } else {
-      await auth.createUserWithEmailAndPassword(email, password);
-      errorMsg.style.color = "green";
-      errorMsg.textContent = "✅ Account created! Redirecting...";
-    }
-    localStorage.setItem("studentEmail", email);
-  } catch (error) {
-    errorMsg.style.color = "red";
-    errorMsg.textContent = error.message;
-  }
-});
+    try {
+      let userCredential;
+      if (isLogin) {
+        userCredential = await auth.signInWithEmailAndPassword(email, password);
+        errorMsg.style.color = "green";
+        errorMsg.textContent = "✅ Login successful! Redirecting...";
+      } else {
+        userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        errorMsg.style.color = "green";
+        errorMsg.textContent = "✅ Account created! Redirecting...";
+      }
 
-  auth.onAuthStateChanged((user) => {
-  if (user) {
-    const email = user.email;
-    localStorage.setItem("studentEmail", email);
+      const user = userCredential.user;
+      const emailAddress = user.email;
+      localStorage.setItem("studentEmail", emailAddress);
 
-    // Add small delay for database readiness (optional)
-    setTimeout(() => {
+      // Redirect based on studentApplications
+      const redirectTimeout = setTimeout(() => {
+        errorMsg.textContent = "⚠️ Taking too long. Redirecting to form...";
+        window.location.href = "PGPCform.html";
+      }, 7000);
+
       db.ref("studentApplications")
         .orderByChild("email")
-        .equalTo(email)
-        .once("value", (snapshot) => {
+        .equalTo(emailAddress)
+        .once("value")
+        .then((snapshot) => {
+          clearTimeout(redirectTimeout);
           if (snapshot.exists()) {
-            // Data exists — go to portal
             window.location.href = "student-portal.html";
           } else {
-            // No data — go to form
             window.location.href = "PGPCform.html";
           }
+        })
+        .catch((error) => {
+          clearTimeout(redirectTimeout);
+          errorMsg.textContent = "Error accessing database. Redirecting...";
+          setTimeout(() => {
+            window.location.href = "PGPCform.html";
+          }, 2000);
         });
-    }, 1000); // 1 second delay
-  }
-});
+
+    } catch (error) {
+      errorMsg.style.color = "red";
+      errorMsg.textContent = error.message;
+    }
+  });
 
   function togglePassword() {
     const input = document.getElementById("password");
