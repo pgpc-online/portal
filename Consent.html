@@ -1,8 +1,9 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Consent, Upload abd Submit</title>
+  <title>Consent, Upload and Submit</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -22,6 +23,9 @@
       margin: auto;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
+  p{
+    text-align: justify;
+  }
     h2 { text-align: center; color: #007bff; }
     .data-preview { background: #f9f9f9; padding: 15px; border-radius: 5px; white-space: pre-wrap; }
     label { display: block; margin-top: 20px; font-weight: bold; }
@@ -45,33 +49,41 @@
 </head>
 <body>
   <div class="container">
-    <h2>Consent, Upload & Submit</h2>
-    <p>Review your information and upload the required documents below:</p>
-    <div class="data-preview" id="previewArea">Loading data...</div><label>Are you a Garciano?</label>
-<div class="radio-group">
-  <label><input type="radio" name="isGarciano" value="yes" onclick="toggleBarangayUpload()"> Yes</label>
-  <label><input type="radio" name="isGarciano" value="no" onclick="toggleBarangayUpload()"> No</label>
+    <div style="text-align: center; margin-bottom: 20px;">
+  <img src="template/pgpc.png" alt="PGPC" style="max-width: 120px; height: auto;" />
 </div>
+    <h2>Consent</h2>
+    <p>I am fully aware that Padre Garcia Polytechnic College is obligated under the Data Privacy Act of 2012 and its Implementing Rules and Regulations (IRR) effective since September 8, 2016, to protect all my personal and sensitive information that it collects, processes, and retains upon my application for admission, enrolment and during my stay in the College. Likewise, I am fully aware that PGPC may share such information to affiliated or partner organizations as part of its contractual obligations, or with government agencies pursuant to law or legal processes. In this regard, I hereby allow PGPC to collect, process, use and share my personal data in the pursuit of its legitimate academic, research and employment purposes and/or interests as an educational institution.</p>
+    <h4>Review your data</h4>
+    <div class="data-preview" id="previewArea">Loading data...</div>
+    <h2>Upload Requirements</h2>
+    <label>Are you a Garciano?</label>
+    <div class="radio-group">
+      <label><input type="radio" name="isGarciano" value="yes" onclick="toggleBarangayUpload()"> Yes</label>
+      <label><input type="radio" name="isGarciano" value="no" onclick="toggleBarangayUpload()"> No</label>
+    </div>
 
-<div class="conditional-upload" id="barangayUpload">
-  <label>Barangay Residency (PDF/Image)</label>
-  <input type="file" id="brgyPhoto" accept=".pdf,image/*">
-</div>
+    <div class="conditional-upload" id="barangayUpload">
+      <label>Barangay Residency (PDF/Image)</label>
+      <input type="file" id="brgyPhoto" accept=".pdf,image/*">
+    </div>
 
-<label>2x2 Photo (JPG/PNG)</label>
-<input type="file" id="photo" accept="image/*" required>
+    <label>2x2 Photo (JPG/PNG)</label>
+    <input type="file" id="photo" accept="image/*" required>
 
-<label>PSA Birth Certificate (PDF/Image)</label>
-<input type="file" id="psa" accept=".pdf,image/*" required>
+    <label>PSA Birth Certificate (PDF/Image)</label>
+    <input type="file" id="psa" accept=".pdf,image/*" required>
 
-<label>Good Moral Certificate (Optional)</label>
-<input type="file" id="goodmoral" accept=".pdf,image/*">
+    <label>Good Moral Certificate (Optional)</label>
+    <input type="file" id="goodmoral" accept=".pdf,image/*">
+    <h2>Oath</h2>
+    <p>I hereby certify that all information supplied in this application form is complete and accurate. I also understand that any false information will disqualify me from being admitted to the College.</p>
+    <button onclick="submitAllData()">Submit All</button>
 
-<button onclick="submitAllData()">Submit All</button>
+    <div class="message" id="statusMessage"></div>
+  </div>
 
-<div class="message" id="statusMessage"></div>
-
-  </div>  <script>
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
       authDomain: "flipbook-a5350.firebaseapp.com",
@@ -88,71 +100,86 @@
 
     const previewArea = document.getElementById("previewArea");
     const formData = {};
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
+    const orderedKeys = ["firstName", "middleName", "lastName", "studentCourse", "studentEmail", "studentAddress", "studentSex", "studentDate", "studentNumber"]; // <-- Add your field keys here
+
+    for (const key of Object.keys(localStorage).sort()) {
       if (!key.startsWith("firebase:")) {
         formData[key] = localStorage.getItem(key);
       }
     }
-    previewArea.textContent = Object.entries(formData).map(([k, v]) => `${k}: ${v}`).join("\n");
+
+    previewArea.textContent = orderedKeys.map(key => `${key}: ${formData[key] || ""}`).join("\n");
 
     function toggleBarangayUpload() {
       const isGarciano = document.querySelector('input[name="isGarciano"]:checked')?.value;
       document.getElementById("barangayUpload").style.display = (isGarciano === "yes") ? "block" : "none";
     }
 
-    function submitAllData() {
+    async function submitAllData() {
       const statusMsg = document.getElementById("statusMessage");
       statusMsg.textContent = "Preparing upload...";
 
-      auth.onAuthStateChanged(async user => {
-        if (!user) {
-          alert("Not logged in. Redirecting to login page.");
-          return location.href = "student-login.html";
-        }
+      const user = auth.currentUser;
+      if (!user) {
+        alert("You must be logged in first.");
+        return location.href = "student-login.html";
+      }
 
-        try {
-          const uid = user.uid;
-          const photo = document.getElementById("photo").files[0];
-          const psa = document.getElementById("psa").files[0];
-          const goodmoral = document.getElementById("goodmoral").files[0];
-          const brgyPhoto = document.getElementById("brgyPhoto").files[0];
-          const isGarciano = document.querySelector('input[name="isGarciano"]:checked')?.value || "no";
+      const uid = user.uid;
+      const photo = document.getElementById("photo").files[0];
+      const psa = document.getElementById("psa").files[0];
+      const goodmoral = document.getElementById("goodmoral").files[0];
+      const brgyPhoto = document.getElementById("brgyPhoto").files[0];
+      const isGarciano = document.querySelector('input[name="isGarciano"]:checked')?.value || "no";
 
-          const upload = async (file, folder) => {
-            if (!file) return null;
-            const ref = storage.ref(`studentApplications/${uid}/${folder}/${Date.now()}_${file.name}`);
-            await ref.put(file);
-            return await ref.getDownloadURL();
-          };
+      // Validate required files
+      if (!photo || !psa) {
+        statusMsg.textContent = "❌ 2x2 Photo and PSA Birth Certificate are required.";
+        return;
+      }
 
-          const photoURL = await upload(photo, "2x2");
-          const psaURL = await upload(psa, "psa");
-          const goodMoralURL = await upload(goodmoral, "goodmoral");
-          const brgyPhotoURL = (isGarciano === "yes") ? await upload(brgyPhoto, "barangay") : null;
+      const maxSizeMB = 5;
+      const isTooBig = file => file && file.size > maxSizeMB * 1024 * 1024;
+      if ([photo, psa, goodmoral, brgyPhoto].some(isTooBig)) {
+        statusMsg.textContent = `❌ File size must be under ${maxSizeMB}MB.`;
+        return;
+      }
 
-          const completeData = {
-            ...formData,
-            photoURL,
-            psaURL,
-            goodMoralURL,
-            isGarciano,
-            brgyPhotoURL,
-            submittedAt: new Date().toISOString()
-          };
+      const upload = async (file, folder) => {
+        if (!file) return null;
+        const ref = storage.ref(`studentApplications/${uid}/${folder}/${Date.now()}_${file.name}`);
+        await ref.put(file);
+        return await ref.getDownloadURL();
+      };
 
-          await db.ref("studentApplications/" + uid).set(completeData);
+      try {
+        const photoURL = await upload(photo, "2x2");
+        const psaURL = await upload(psa, "psa");
+        const goodMoralURL = await upload(goodmoral, "goodmoral");
+        const brgyPhotoURL = isGarciano === "yes" ? await upload(brgyPhoto, "barangay") : null;
 
-          statusMsg.textContent = "✅ All data submitted successfully!";
-          localStorage.clear();
-          setTimeout(() => location.href = "student-portal.html", 1500);
-        } catch (error) {
-          console.error(error);
-          statusMsg.textContent = "❌ Error: " + error.message;
-        }
-      });
+        const completeData = {
+          ...formData,
+          photoURL,
+          psaURL,
+          goodMoralURL,
+          isGarciano,
+          brgyPhotoURL,
+          submittedAt: new Date().toISOString()
+        };
+
+        await db.ref("studentApplications/" + uid).set(completeData);
+        statusMsg.textContent = "✅ Submitted successfully!";
+        localStorage.clear();
+
+        setTimeout(() => location.href = "student-portal.html", 1500);
+      } catch (error) {
+        console.error(error);
+        statusMsg.textContent = "❌ Upload failed: " + error.message;
+      }
     }
 
     window.addEventListener("DOMContentLoaded", toggleBarangayUpload);
-  </script></body>
+  </script>
+</body>
 </html>
