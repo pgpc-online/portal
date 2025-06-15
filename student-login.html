@@ -7,7 +7,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <style>
+    <style>
     :root {
       --bg: #f0f2f5; --text: #111; --card: #fff; --primary: #3f51b5;
     }
@@ -85,7 +85,7 @@
     <div id="errorMsg"></div>
   </form>
 </div>
-
+  
 <script>
   // Firebase config
   const firebaseConfig = {
@@ -98,7 +98,6 @@
     measurementId: "G-LCKP7BY0L7"
   };
 
-  // Init Firebase
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
@@ -130,54 +129,48 @@
 
     try {
       let userCredential;
+
       if (isLogin) {
         userCredential = await auth.signInWithEmailAndPassword(email, password);
         errorMsg.style.color = "green";
-        errorMsg.textContent = "✅ Login successful! Redirecting...";
+        errorMsg.textContent = "✅ Login successful! Checking form status...";
       } else {
         userCredential = await auth.createUserWithEmailAndPassword(email, password);
         const user = userCredential.user;
 
-        // Save to Firestore with basic fields
         await db.collection("studentApplications").doc(user.uid).set({
           email: user.email,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          formSubmitted: false, // default false
           status: "new"
         });
 
         errorMsg.style.color = "green";
-        errorMsg.textContent = "✅ Account created! Redirecting...";
+        errorMsg.textContent = "✅ Account created! Redirecting to form...";
+        setTimeout(() => {
+          window.location.href = "PGPCform.html";
+        }, 2000);
+        return;
       }
 
       const user = userCredential.user;
       const emailAddress = user.email;
       localStorage.setItem("studentEmail", emailAddress);
 
-      // Show "taking too long" fallback
-      const redirectTimeout = setTimeout(() => {
-        errorMsg.textContent = "⚠️ Taking too long. Redirecting to form...";
-        window.location.href = "PGPCform.html";
-      }, 7000);
+      const docRef = db.collection("studentApplications").doc(user.uid);
+      const doc = await docRef.get();
 
-      // Firestore query
-      db.collection("studentApplications")
-        .where("email", "==", emailAddress)
-        .get()
-        .then((querySnapshot) => {
-          clearTimeout(redirectTimeout);
-          if (!querySnapshot.empty) {
-            window.location.href = "student-portal.html";
-          } else {
-            window.location.href = "PGPCform.html";
-          }
-        })
-        .catch((error) => {
-          clearTimeout(redirectTimeout);
-          errorMsg.textContent = "Error accessing database. Redirecting...";
-          setTimeout(() => {
-            window.location.href = "PGPCform.html";
-          }, 2000);
-        });
+      if (doc.exists && doc.data().formSubmitted === true) {
+        errorMsg.textContent = "✅ Form found. Redirecting to portal...";
+        setTimeout(() => {
+          window.location.href = "student-portal.html";
+        }, 2000);
+      } else {
+        errorMsg.textContent = "📝 Form not yet completed. Redirecting...";
+        setTimeout(() => {
+          window.location.href = "PGPCform.html";
+        }, 2000);
+      }
 
     } catch (error) {
       errorMsg.style.color = "red";
