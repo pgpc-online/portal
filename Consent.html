@@ -50,7 +50,7 @@
 <body>
   <div class="container">
     <div style="text-align: center; margin-bottom: 20px;">
-  <img src="template/pgpc.png" alt="PGPC" style="max-width: 120px; height: auto;" />
+  <img src="template/pgpc.png" alt="PGPC" style="width:50px; height: auto;" />
 </div>
     <h2>Consent</h2>
     <p>I am fully aware that Padre Garcia Polytechnic College is obligated under the Data Privacy Act of 2012 and its Implementing Rules and Regulations (IRR) effective since September 8, 2016, to protect all my personal and sensitive information that it collects, processes, and retains upon my application for admission, enrolment and during my stay in the College. Likewise, I am fully aware that PGPC may share such information to affiliated or partner organizations as part of its contractual obligations, or with government agencies pursuant to law or legal processes. In this regard, I hereby allow PGPC to collect, process, use and share my personal data in the pursuit of its legitimate academic, research and employment purposes and/or interests as an educational institution.</p>
@@ -100,7 +100,7 @@
 
     const previewArea = document.getElementById("previewArea");
     const formData = {};
-    const orderedKeys = ["firstName", "middleName", "lastName", "studentCourse", "studentEmail", "studentAddress", "studentSex", "studentDate", "studentNumber"]; // <-- Add your field keys here
+    const orderedKeys = ["fullName", "studentCourse", "studentEmail", "studentAddress", "studentSex", "studentDate", "studentNumber"]; // <-- Add your field keys here
 
     for (const key of Object.keys(localStorage).sort()) {
       if (!key.startsWith("firebase:")) {
