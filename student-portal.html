@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Student Portal</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg: #f9f9f9;
@@ -86,7 +86,7 @@
   </header>
 
   <div class="container">
-    <img id="profilePic" class="profile-pic" src="" alt="Profile Photo"/>
+    <img id="profilePic" class="profile-pic" src="" alt="Profile Photo" />
     <h2>Welcome, <span id="studentName">Student</span>!</h2>
 
     <div class="info" id="studentInfo">
@@ -94,7 +94,7 @@
       <p><strong>Address:</strong> <span id="studentAddress"></span></p>
       <p><strong>Contact:</strong> <span id="studentContact"></span></p>
       <p><strong>Garciano:</strong> <span id="isGarciano"></span></p>
-      <!-- Add more fields as needed -->
+      <p><strong>Submitted Date:</strong> <span id="submittedDate"></span></p>
     </div>
   </div>
 
@@ -102,16 +102,16 @@
     const firebaseConfig = {
       apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
       authDomain: "flipbook-a5350.firebaseapp.com",
-      databaseURL: "https://flipbook-a5350-default-rtdb.firebaseio.com",
       projectId: "flipbook-a5350",
       storageBucket: "flipbook-a5350.appspot.com",
       messagingSenderId: "570378601966",
       appId: "1:570378601966:web:96ebb77badba7e33107aff",
       measurementId: "G-LCKP7BY0L7"
     };
+
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.database();
+    const db = firebase.firestore();  // Firestore instance
 
     function toggleDarkMode() {
       const html = document.documentElement;
@@ -126,16 +126,47 @@
 
     auth.onAuthStateChanged(async user => {
       if (!user) return window.location.href = "student-login.html";
-      const uid = user.uid;
-      const snap = await db.ref("studentApplications/" + uid).once("value");
-      const data = snap.val();
 
-      document.getElementById("profilePic").src = data.photoURL || "https://via.placeholder.com/120";
-      document.getElementById("studentName").textContent = data.firstname + " " + data.lastname;
-      document.getElementById("studentEmail").textContent = user.email;
-      document.getElementById("studentAddress").textContent = data.address || "N/A";
-      document.getElementById("studentContact").textContent = data.contact || "N/A";
-      document.getElementById("isGarciano").textContent = data.isGarciano === "yes" ? "Yes" : "No";
+      const uid = user.uid;
+
+      try {
+        // Get Firestore document for the user
+        const docRef = db.collection("studentApplications").doc(uid);
+        const docSnap = await docRef.get();
+
+        if (!docSnap.exists) {
+          alert("No data found for this user.");
+          return;
+        }
+
+        const data = docSnap.data();
+
+        // Display profile photo or placeholder
+        document.getElementById("profilePic").src = data.photoURL || "https://via.placeholder.com/120";
+
+        // If you have fullName as one field
+        document.getElementById("studentName").textContent = data.fullName || "Student";
+
+        // Or if separate firstname and lastname, use:
+        // document.getElementById("studentName").textContent = (data.firstname || "") + " " + (data.lastname || "");
+
+        document.getElementById("studentEmail").textContent = user.email || "N/A";
+        document.getElementById("studentAddress").textContent = data.studentAddress || "N/A";
+        document.getElementById("studentContact").textContent = data.studentContact || "N/A";
+        document.getElementById("isGarciano").textContent = data.isGarciano === "yes" ? "Yes" : "No";
+
+        // Format the submittedAt date nicely if exists
+        if (data.submittedAt) {
+          const date = new Date(data.submittedAt);
+          document.getElementById("submittedDate").textContent = date.toLocaleDateString() + " " + date.toLocaleTimeString();
+        } else {
+          document.getElementById("submittedDate").textContent = "N/A";
+        }
+
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        alert("Failed to load data. Please try again later.");
+      }
     });
   </script>
 </body>
