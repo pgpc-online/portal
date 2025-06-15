@@ -3,8 +3,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
-   
-  <title>Student Portal</title>
+  <title>Student homepage</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -14,11 +13,13 @@
       --bg: #f9f9f9;
       --text: #333;
       --card: #fff;
+      --note-bg: #fff8b3;
     }
     [data-theme="dark"] {
       --bg: #121212;
       --text: #e0e0e0;
       --card: #1e1e1e;
+      --note-bg: #4f4f1c;
     }
     body {
       font-family: 'Inter', sans-serif;
@@ -75,33 +76,27 @@
       justify-content: space-between;
       margin-top: 2rem;
     }
-    .notes-section {
+    #notesSection {
       margin-top: 3rem;
     }
     .note-card {
-      background: var(--card);
+      background: var(--note-bg);
+      border-radius: 8px;
       padding: 1rem;
-      border-left: 4px solid #0047AB;
       margin-bottom: 1rem;
-      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    .modal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.5);
-      z-index: 1000;
+    .note-card h4 {
+      margin: 0.2rem 0;
     }
-    .modal-content {
-      background: var(--card);
-      padding: 2rem;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 400px;
+    .note-actions {
+      margin-top: 0.5rem;
     }
-    .modal input, .modal textarea {
+    .note-actions button {
+      margin-right: 0.5rem;
+      background: #0047AB;
+    }
+    #searchInput {
       width: 100%;
       padding: 0.5rem;
       margin-bottom: 1rem;
@@ -118,8 +113,9 @@
       <button onclick="logout()"> Logout</button>
     </div>
   </header>  <div class="container">
+<h2>Welcome, <span id="studentName">Student</span>!</h2><div class="info" id="studentInfo">
     <img id="profilePic" class="profile-pic" src="" alt="Profile Photo" />
-    <h2>Welcome, <span id="studentName">Student</span>!</h2><div class="info" id="studentInfo">
+  
   <p><strong>Email:</strong> <span id="studentEmail"></span></p>
   <p><strong>Address:</strong> <span id="studentAddress"></span></p>
   <p><strong>Contact:</strong> <span id="studentContact"></span></p>
@@ -127,23 +123,19 @@
   <p><strong>Submitted Date:</strong> <span id="submittedDate"></span></p>
 </div>
 
-<div class="notes-section">
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h3>Your Notes</h3>
-    <button onclick="openNoteModal()">➕ Add Note</button>
+<div id="notesSection">
+  <h3>Your Notes</h3>
+  <input type="text" id="searchInput" placeholder="Search notes..." onkeyup="filterNotes()" />
+  <button onclick="openNoteForm()">➕ Add Note</button>
+  <div id="noteForm" style="display:none; margin-top:1rem;">
+    <input type="date" id="noteDate" />
+    <input type="text" id="noteTitle" placeholder="Title" />
+    <textarea id="noteDescription" placeholder="Description"></textarea>
+    <button onclick="saveNote()">💾 Save</button>
   </div>
   <div id="notesList"></div>
 </div>
 
-  </div>  <div class="modal" id="noteModal">
-    <div class="modal-content">
-      <h3>New Note</h3>
-      <input type="date" id="noteDate" />
-      <input type="text" id="noteTitle" placeholder="Title" />
-      <textarea id="noteDescription" rows="4" placeholder="Description..."></textarea>
-      <button onclick="saveNote()">💾 Save</button>
-      <button onclick="closeNoteModal()">❌ Cancel</button>
-    </div>
   </div>  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
@@ -158,6 +150,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+    let currentUID;
 
     function toggleDarkMode() {
       const html = document.documentElement;
@@ -170,58 +163,80 @@
       });
     }
 
-    function openNoteModal() {
-      document.getElementById("noteModal").style.display = "flex";
-    }
-
-    function closeNoteModal() {
-      document.getElementById("noteModal").style.display = "none";
+    function openNoteForm() {
+      document.getElementById('noteForm').style.display = 'block';
     }
 
     function saveNote() {
-      const date = document.getElementById("noteDate").value;
-      const title = document.getElementById("noteTitle").value;
-      const description = document.getElementById("noteDescription").value;
+      const date = document.getElementById('noteDate').value;
+      const title = document.getElementById('noteTitle').value;
+      const description = document.getElementById('noteDescription').value;
 
-      if (!date || !title || !description) return alert("Please fill out all fields.");
+      if (!title || !description) return alert('Title and description are required');
 
-      const user = auth.currentUser;
-      if (!user) return alert("Not authenticated.");
+      db.collection("notes").add({
+        uid: currentUID,
+        date,
+        title,
+        description,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
 
-      db.collection("studentApplications")
-        .doc(user.uid)
-        .collection("notes")
-        .add({ date, title, description, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
-        .then(() => {
-          closeNoteModal();
-          loadNotes(user.uid);
-        })
-        .catch(err => alert("Error saving note: " + err));
+      document.getElementById('noteForm').style.display = 'none';
+      document.getElementById('noteDate').value = '';
+      document.getElementById('noteTitle').value = '';
+      document.getElementById('noteDescription').value = '';
     }
 
-    function loadNotes(uid) {
-      const notesList = document.getElementById("notesList");
-      notesList.innerHTML = "Loading...";
+    function deleteNote(id) {
+      db.collection("notes").doc(id).delete();
+    }
 
-      db.collection("studentApplications")
-        .doc(uid)
-        .collection("notes")
+    function editNote(id, note) {
+      const title = prompt("Edit Title", note.title);
+      const description = prompt("Edit Description", note.description);
+      if (title && description) {
+        db.collection("notes").doc(id).update({ title, description });
+      }
+    }
+
+    function filterNotes() {
+      const search = document.getElementById("searchInput").value.toLowerCase();
+      const notes = document.querySelectorAll(".note-card");
+      notes.forEach(note => {
+        const text = note.textContent.toLowerCase();
+        note.style.display = text.includes(search) ? "block" : "none";
+      });
+    }
+
+    function renderNotes(uid) {
+      db.collection("notes")
+        .where("uid", "==", uid)
         .orderBy("createdAt", "desc")
-        .get()
-        .then(snapshot => {
-          notesList.innerHTML = "";
+        .onSnapshot(snapshot => {
+          const list = document.getElementById("notesList");
+          list.innerHTML = "";
           snapshot.forEach(doc => {
-            const note = doc.data();
-            const card = document.createElement("div");
-            card.className = "note-card";
-            card.innerHTML = `<strong>${note.title}</strong><br><small>${note.date}</small><p>${note.description}</p>`;
-            notesList.appendChild(card);
+            const data = doc.data();
+            const div = document.createElement("div");
+            div.className = "note-card";
+            div.innerHTML = `
+              <h4>${data.title}</h4>
+              <small>${data.date || ""}</small>
+              <p>${data.description}</p>
+              <div class="note-actions">
+                <button onclick="editNote('${doc.id}', ${JSON.stringify(data).replace(/"/g, '&quot;')})">✏️ Edit</button>
+                <button onclick="deleteNote('${doc.id}')">🗑️ Delete</button>
+              </div>
+            `;
+            list.appendChild(div);
           });
         });
     }
 
     auth.onAuthStateChanged(async user => {
       if (!user) return window.location.href = "student-login.html";
+      currentUID = user.uid;
 
       const uid = user.uid;
 
@@ -235,6 +250,7 @@
         }
 
         const data = docSnap.data();
+
         document.getElementById("profilePic").src = data.photoURL || "https://via.placeholder.com/120";
         document.getElementById("studentName").textContent = data.fullName || "Student";
         document.getElementById("studentEmail").textContent = user.email || "N/A";
@@ -249,7 +265,7 @@
           document.getElementById("submittedDate").textContent = "N/A";
         }
 
-        loadNotes(uid);
+        renderNotes(uid);
 
       } catch (error) {
         console.error("Error fetching user data:", error);
