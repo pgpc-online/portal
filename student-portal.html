@@ -7,7 +7,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     :root {
       --bg: #f9f9f9;
@@ -34,38 +33,6 @@
       background-color: var(--card);
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .menu {
-      display: none;
-      flex-direction: column;
-      background-color: var(--card);
-      position: absolute;
-      top: 60px;
-      right: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      padding: 10px;
-      border-radius: 8px;
-    }
-    .menu a {
-      padding: 8px;
-      text-decoration: none;
-      color: var(--text);
-    }
-    .menu-btn {
-      display: none;
-      font-size: 1.5rem;
-      background: none;
-      border: none;
-      color: var(--text);
-      cursor: pointer;
-    }
-    @media (max-width: 768px) {
-      .menu-btn {
-        display: block;
-      }
-      .nav-desktop {
-        display: none;
-      }
-    }
     .container {
       max-width: 800px;
       margin: 2rem auto;
@@ -87,6 +54,9 @@
       margin: 0 auto 1rem;
       border: 3px solid #0047AB;
     }
+    .info {
+      margin: 1rem 0;
+    }
     .info p {
       margin: 0.5rem 0;
     }
@@ -98,62 +68,52 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    .nav-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 1rem;
+    .btns {
+      display: flex;
+      justify-content: space-between;
       margin-top: 2rem;
     }
-    .nav-card {
-      background-color: #0047AB;
-      color: white;
-      padding: 1.2rem;
-      text-align: center;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: background 0.3s;
+    .notes-section {
+      margin-top: 3rem;
     }
-    .nav-card:hover {
-      background-color: #003a92;
-    }
-    .status-box {
-      background: #e3f2fd;
+    .note-card {
+      background: var(--card);
       padding: 1rem;
-      border-left: 5px solid #0047AB;
+      border-left: 4px solid #0047AB;
       margin-bottom: 1rem;
       border-radius: 8px;
     }
-    [data-theme="dark"] .status-box {
-      background: #263238;
-      color: #e0f7fa;
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
     }
-    .progress {
-      background: #ddd;
-      border-radius: 20px;
-      overflow: hidden;
-      margin: 1rem 0;
-      height: 20px;
+    .modal-content {
+      background: var(--card);
+      padding: 2rem;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
     }
-    .progress-bar {
-      height: 100%;
-      width: 0;
-      background-color: #0047AB;
-      transition: width 0.5s ease;
+    .modal input, .modal textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
   <header>
     <h3>PGPC Student</h3>
-    <div class="nav-desktop">
-      <button onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+    <div>
+      <button onclick="toggleDarkMode()">🌓</button>
       <button onclick="logout()">🚪 Logout</button>
-    </div>
-    <button class="menu-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
-    <div class="menu" id="mobileMenu">
-      <a href="#" onclick="toggleDarkMode()">Toggle Dark Mode</a>
-      <a href="#" onclick="logout()">Logout</a>
     </div>
   </header>  <div class="container">
     <img id="profilePic" class="profile-pic" src="" alt="Profile Photo" />
@@ -165,23 +125,23 @@
   <p><strong>Submitted Date:</strong> <span id="submittedDate"></span></p>
 </div>
 
-<div class="status-box">
-  <p><strong>Form Status:</strong> <span id="formStatus">Loading...</span></p>
+<div class="notes-section">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h3>Your Notes</h3>
+    <button onclick="openNoteModal()">➕ Add Note</button>
+  </div>
+  <div id="notesList"></div>
 </div>
 
-<div class="progress">
-  <div class="progress-bar" id="progressBar"></div>
-</div>
-
-<div class="nav-grid">
-  <a class="nav-card" href="form1.html">📝 Student Form</a>
-  <a class="nav-card" href="form2.html">👨‍👩‍👧 Family Info</a>
-  <a class="nav-card" href="Consent.html">📋 Consent</a>
-  <a class="nav-card" href="Upload.html">📎 Upload Files</a>
-  <a class="nav-card" href="Preview.html">👁️ Preview</a>
-  <a class="nav-card" href="Download.html">📥 Download PDF</a>
-</div>
-
+  </div>  <div class="modal" id="noteModal">
+    <div class="modal-content">
+      <h3>New Note</h3>
+      <input type="date" id="noteDate" />
+      <input type="text" id="noteTitle" placeholder="Title" />
+      <textarea id="noteDescription" rows="4" placeholder="Description..."></textarea>
+      <button onclick="saveNote()">💾 Save</button>
+      <button onclick="closeNoteModal()">❌ Cancel</button>
+    </div>
   </div>  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
@@ -208,9 +168,54 @@
       });
     }
 
-    function toggleMenu() {
-      const menu = document.getElementById("mobileMenu");
-      menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+    function openNoteModal() {
+      document.getElementById("noteModal").style.display = "flex";
+    }
+
+    function closeNoteModal() {
+      document.getElementById("noteModal").style.display = "none";
+    }
+
+    function saveNote() {
+      const date = document.getElementById("noteDate").value;
+      const title = document.getElementById("noteTitle").value;
+      const description = document.getElementById("noteDescription").value;
+
+      if (!date || !title || !description) return alert("Please fill out all fields.");
+
+      const user = auth.currentUser;
+      if (!user) return alert("Not authenticated.");
+
+      db.collection("studentApplications")
+        .doc(user.uid)
+        .collection("notes")
+        .add({ date, title, description, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+        .then(() => {
+          closeNoteModal();
+          loadNotes(user.uid);
+        })
+        .catch(err => alert("Error saving note: " + err));
+    }
+
+    function loadNotes(uid) {
+      const notesList = document.getElementById("notesList");
+      notesList.innerHTML = "Loading...";
+
+      db.collection("studentApplications")
+        .doc(uid)
+        .collection("notes")
+        .orderBy("createdAt", "desc")
+        .get()
+        .then(snapshot => {
+          notesList.innerHTML = "";
+          snapshot.forEach(doc => {
+            const note = doc.data();
+            const card = document.createElement("div");
+            card.className = "note-card";
+            card.innerHTML = `<strong>${note.title}</strong><br><small>${note.date}</small><p>${note.description}</p>`;
+            notesList.appendChild(card);
+          });
+        });
     }
 
     auth.onAuthStateChanged(async user => {
@@ -228,7 +233,6 @@
         }
 
         const data = docSnap.data();
-
         document.getElementById("profilePic").src = data.photoURL || "https://via.placeholder.com/120";
         document.getElementById("studentName").textContent = data.fullName || "Student";
         document.getElementById("studentEmail").textContent = user.email || "N/A";
@@ -243,16 +247,7 @@
           document.getElementById("submittedDate").textContent = "N/A";
         }
 
-        const requiredFields = ["fullName", "studentAddress", "studentNumber"];
-        const isComplete = requiredFields.every(field => data[field]);
-        document.getElementById("formStatus").textContent = isComplete ? "✅ Application Submitted" : "⚠️ Incomplete — Please continue your submission.";
-
-        let steps = 0;
-        if (user) steps += 1;
-        if (data.fullName && data.studentAddress) steps += 1;
-        if (data.examTaken) steps += 1;
-
-        document.getElementById("progressBar").style.width = `${(steps / 3) * 100}%`;
+        loadNotes(uid);
 
       } catch (error) {
         console.error("Error fetching user data:", error);
