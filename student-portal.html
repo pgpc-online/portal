@@ -1,9 +1,10 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
-  <title>Student homepage</title>
+  <title>Student Homepage</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -107,36 +108,42 @@
 </head>
 <body>
   <header>
+
     <h3>PGPC <span style="font-family: 'Michroma', sans-serif; font-size: 20px;">Student<span></h3>
     <div>
       <button onclick="toggleDarkMode()">🌓</button>
       <button onclick="logout()"> Logout</button>
     </div>
-  </header>  <div class="container">
-<h2>Welcome, <span id="studentName">Student</span>!</h2><div class="info" id="studentInfo">
+  </header>
+
+  <div class="container">
+<h2>Welcome, <span id="studentName">Student</span>!</h2>
+
     <img id="profilePic" class="profile-pic" src="" alt="Profile Photo" />
-  
-  <p><strong>Email:</strong> <span id="studentEmail"></span></p>
-  <p><strong>Address:</strong> <span id="studentAddress"></span></p>
-  <p><strong>Contact:</strong> <span id="studentContact"></span></p>
-  <p><strong>Garciano:</strong> <span id="isGarciano"></span></p>
-  <p><strong>Submitted Date:</strong> <span id="submittedDate"></span></p>
-</div>
+    
+    <div class="info" id="studentInfo">
+      <p><strong>Email:</strong> <span id="studentEmail"></span></p>
+      <p><strong>Address:</strong> <span id="studentAddress"></span></p>
+      <p><strong>Contact:</strong> <span id="studentContact"></span></p>
+      <p><strong>Garciano:</strong> <span id="isGarciano"></span></p>
+      <p><strong>Submitted Date:</strong> <span id="submittedDate"></span></p>
+    </div>
 
-<div id="notesSection">
-  <h3>Your Notes</h3>
-  <input type="text" id="searchInput" placeholder="Search notes..." onkeyup="filterNotes()" />
-  <button onclick="openNoteForm()">➕ Add Note</button>
-  <div id="noteForm" style="display:none; margin-top:1rem;">
-    <input type="date" id="noteDate" />
-    <input type="text" id="noteTitle" placeholder="Title" />
-    <textarea id="noteDescription" placeholder="Description"></textarea>
-    <button onclick="saveNote()">💾 Save</button>
+    <div id="notesSection">
+      <h3>Your Notes</h3>
+      <input type="text" id="searchInput" placeholder="Search notes..." onkeyup="filterNotes()" />
+      <button onclick="openNoteForm()">➕ Add Note</button>
+      <div id="noteForm" style="display:none; margin-top:1rem;">
+        <input type="date" id="noteDate" />
+        <input type="text" id="noteTitle" placeholder="Title" />
+        <textarea id="noteDescription" placeholder="Description"></textarea>
+        <button onclick="saveNote()">💾 Save</button>
+      </div>
+      <div id="notesList"></div>
+    </div>
   </div>
-  <div id="notesList"></div>
-</div>
 
-  </div>  <script>
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
       authDomain: "flipbook-a5350.firebaseapp.com",
@@ -272,5 +279,6 @@
         alert("Failed to load data. Please try again later.");
       }
     });
-  </script></body>
+  </script>
+</body>
 </html>
