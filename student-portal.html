@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
-  <title>Student Portal</title>
+  <title>Student Homepage</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -125,12 +125,18 @@
     
 
     <div class="info" id="studentInfo">
+<p><strong>Fullname:</strong> <span id="fullName"></span></p>
+ <p><strong>Course:</strong> <span id="studentCourse"></span></p>
       <p><strong>Email:</strong> <span id="studentEmail"></span></p>
+<p><strong>Contact:</strong> <span id="studentContact"></span></p>
       <p><strong>Address:</strong> <span id="studentAddress"></span></p>
-      <p><strong>Contact:</strong> <span id="studentContact"></span></p>
-      <p><strong>Garciano:</strong> <span id="isGarciano"></span></p>
-      <p><strong>Submitted Date:</strong> <span id="submittedDate"></span></p>
+      
+      <p><strong>Birthday:</strong> <span id="birthDate"></span></p>
+      <p><strong>Gender:</strong> <span id="studentSex"></span></p>
     </div>
+
+<button id="viewMoreBtn" onclick="toggleFullInfo()">🔽 View More</button>
+<div id="fullInfo" style="display:none; margin-top: 1rem;"></div>
 
     <div class="notes-section">
       <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -177,6 +183,19 @@
         window.location.href = "index.html";
       });
     }
+function toggleFullInfo() {
+  const section = document.getElementById("fullInfo");
+  const btn = document.getElementById("viewMoreBtn");
+
+  if (section.style.display === "none") {
+    section.style.display = "block";
+    btn.innerHTML = "🔼 View Less";
+  } else {
+    section.style.display = "none";
+    btn.innerHTML = "🔽 View More";
+  }
+}
+
 
     function openNoteModal() {
       document.getElementById("noteModal").style.display = "flex";
@@ -248,6 +267,7 @@
         document.getElementById("studentEmail").textContent = user.email || "N/A";
         document.getElementById("studentAddress").textContent = data.studentAddress || "N/A";
         document.getElementById("studentContact").textContent = data.studentNumber || "N/A";
+
         document.getElementById("isGarciano").textContent = data.isGarciano === "yes" ? "Yes" : "No";
 
         if (data.submittedAt) {
@@ -256,6 +276,23 @@
         } else {
           document.getElementById("submittedDate").textContent = "N/A";
         }
+
+let fullDetailsHTML = `
+  <p><strong>Civil Status:</strong> ${data.civilStatus || 'N/A'}</p>
+  <p><strong>Religion:</strong> ${data.studentReligion || 'N/A'}</p>
+  <p><strong>Citizenship:</strong> ${data.studentCitizenship || 'N/A'}</p>
+  <p><strong>Father:</strong> ${data.fatherName || 'N/A'}</p>
+  <p><strong>Father's Contact:</strong> ${data.fatherNumber || 'N/A'}</p>
+  <p><strong>Mother:</strong> ${data.motherName || 'N/A'}</p>
+<p><strong>Mother's Contact:</strong> ${data.motherNumber || 'N/A'}</p>
+  <p><strong>Guardian Name:</strong> ${data.guardianName || 'N/A'}</p>
+  <p><strong>Guardian Contact:</strong> ${data.guardianNumber || 'N/A'}</p>
+  <p><strong>Family Income:</strong> ${data.familyIncome || 'N/A'}</p>
+  <p><strong>Garciano:</strong> ${data.isGarciano || 'N/A'}</p>
+`;
+
+document.getElementById("fullInfo").innerHTML = fullDetailsHTML;
+
 
         loadNotes(uid);
 
