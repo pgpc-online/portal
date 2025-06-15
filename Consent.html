@@ -106,6 +106,7 @@
     const db = firebase.firestore();
     const storage = firebase.storage();
 
+formData.fullName = [formData.firstName, formData.middleName, formData.lastName].filter(Boolean).join(" ");
     const previewArea = document.getElementById("previewArea");
     const formData = {};
     const orderedKeys = ["fullName", "studentCourse", "studentEmail", "studentAddress", "studentSex", "studentDate", "studentNumber"];
