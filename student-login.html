@@ -73,15 +73,15 @@
     <img src="template/pgpc.png" alt="PGPC" style="width: 50px; height: auto;"/>
 </div>
 
-  <h2 id="formTitle">Student Login</h2>
+  <h2 id="formTitle">Login</h2>
   <form id="authForm">
     <input type="email" id="email" placeholder="Enter your email" required />
     <div class="password-wrapper">
       <input type="password" id="password" placeholder="Enter your password" required />
-      <span class="toggle-password" onclick="togglePassword()">👁️</span>
+      <span class="toggle-password" onclick="togglePassword()">🙉</span>
     </div>
     <button type="submit" id="submitBtn">Login</button>
-    <small id="switch">Don't have an account? Register here</small>
+    <small id="switch">Don't have an account? REGISTER here</small>
     <div id="errorMsg"></div>
   </form>
 </div>
@@ -119,8 +119,8 @@
     formTitle.textContent = isLogin ? "Student Login" : "Student Registration";
     submitBtn.textContent = isLogin ? "Login" : "Register";
     switchLink.textContent = isLogin
-      ? "Don't have an account? Register here"
-      : "Already have an account? Login here";
+      ? "Don't have an account? REGISTER here"
+      : "Already have an account? LOGIN here";
     errorMsg.textContent = "";
     errorMsg.style.color = "red";
   });
@@ -197,7 +197,7 @@
       icon.textContent = "🙈";
     } else {
       input.type = "password";
-      icon.textContent = "👁️";
+      icon.textContent = "🙉";
     }
   }
 
