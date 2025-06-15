@@ -281,14 +281,13 @@
     </form>
   </div>
 
-  <!-- Firebase SDKs -->
+  
  <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
 <script>
-  // Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
     authDomain: "flipbook-a5350.firebaseapp.com",
@@ -346,20 +345,22 @@
     try {
       document.getElementById("loading").style.display = "block";
 
-      // Save to 'applications' collection
-      await db.collection("applications").add(dataObject);
+      // Get current authenticated user
+      const currentUser = auth.currentUser;
+
+      if (!currentUser) {
+        throw new Error("User not logged in. Please log in again.");
+      }
+
+      // Save all form data to a doc with user's UID in studentApplications
+      await db.collection("studentApplications").doc(currentUser.uid).set({
+        ...dataObject,
+        formSubmitted: true,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
 
       document.getElementById("loading").style.display = "none";
       document.getElementById("successMsg").style.display = "block";
-
-      // Update user's application status (if authenticated)
-      const currentUser = auth.currentUser;
-      if (currentUser) {
-        await db.collection("studentApplications").doc(currentUser.uid).set({
-          formSubmitted: true,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-      }
 
       // Redirect after success
       setTimeout(() => {
