@@ -93,127 +93,149 @@
 <div class="message" id="statusMessage"></div>
 
   </div>  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
-      authDomain: "flipbook-a5350.firebaseapp.com",
-      projectId: "flipbook-a5350",
-      storageBucket: "flipbook-a5350.appspot.com",
-      messagingSenderId: "570378601966",
-      appId: "1:570378601966:web:96ebb77badba7e33107aff"
+  const firebaseConfig = {
+    apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
+    authDomain: "flipbook-a5350.firebaseapp.com",
+    projectId: "flipbook-a5350",
+    storageBucket: "flipbook-a5350.appspot.com",
+    messagingSenderId: "570378601966",
+    appId: "1:570378601966:web:96ebb77badba7e33107aff"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+  const previewArea = document.getElementById("previewArea");
+  const formData = {};
+
+  // Populate formData from localStorage
+  for (const key of Object.keys(localStorage)) {
+    if (!key.startsWith("firebase:")) {
+      formData[key] = localStorage.getItem(key);
+    }
+  }
+
+  // Construct full name and display preview
+  formData.fullName = [formData.firstName, formData.middleName, formData.lastName].filter(Boolean).join(" ");
+
+  const orderedKeys = [
+    "fullName",
+    "studentCourse",
+    "studentEmail",
+    "studentAddress",
+    "studentSex",
+    "studentDate",
+    "studentNumber"
+  ];
+
+  previewArea.textContent = orderedKeys
+    .map(key => `${key}: ${formData[key] || ""}`)
+    .join("\n");
+
+  function toggleBarangayUpload() {
+    const isGarciano = document.querySelector('input[name="isGarciano"]:checked')?.value;
+    document.getElementById("barangayUpload").style.display = (isGarciano === "yes") ? "block" : "none";
+  }
+
+  function displayFileSize(inputId, labelId) {
+    const file = document.getElementById(inputId).files[0];
+    const label = document.getElementById(labelId);
+    label.textContent = file ? `Size: ${(file.size / (1024 * 1024)).toFixed(2)} MB` : "";
+  }
+
+  ["photo", "psa", "goodmoral", "brgyPhoto"].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      input.addEventListener("change", () => {
+        displayFileSize(id, "size" + id.charAt(0).toUpperCase() + id.slice(1));
+      });
+    }
+  });
+
+  async function submitAllData() {
+    const statusMsg = document.getElementById("statusMessage");
+    statusMsg.textContent = "Preparing upload...";
+
+    const user = auth.currentUser;
+    if (!user) {
+      alert("You must be logged in first.");
+      return (location.href = "student-login.html");
+    }
+
+    const uid = user.uid;
+    const photo = document.getElementById("photo").files[0];
+    const psa = document.getElementById("psa").files[0];
+    const goodmoral = document.getElementById("goodmoral").files[0];
+    const brgyPhoto = document.getElementById("brgyPhoto").files[0];
+    const isGarciano = document.querySelector('input[name="isGarciano"]:checked')?.value || "no";
+
+    const maxSizeMB = 5;
+    const errors = [];
+
+    const isTooBig = (file, labelId) => {
+      const errorEl = document.getElementById("error" + labelId);
+      if (file && file.size > maxSizeMB * 1024 * 1024) {
+        errorEl.textContent = `File exceeds ${maxSizeMB}MB limit.`;
+        errors.push(labelId);
+      } else if (errorEl) {
+        errorEl.textContent = "";
+      }
     };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
 
-formData.fullName = [formData.firstName, formData.middleName, formData.lastName].filter(Boolean).join(" ");
-    const previewArea = document.getElementById("previewArea");
-    const formData = {};
-    const orderedKeys = ["fullName", "studentCourse", "studentEmail", "studentAddress", "studentSex", "studentDate", "studentNumber"];
-
-    for (const key of Object.keys(localStorage).sort()) {
-      if (!key.startsWith("firebase:")) {
-        formData[key] = localStorage.getItem(key);
-      }
+    // Check required files
+    if (!photo || !psa) {
+      statusMsg.textContent = "❌ 2x2 Photo and PSA Birth Certificate are required.";
+      return;
     }
 
-    previewArea.textContent = orderedKeys.map(key => `${key}: ${formData[key] || ""}`).join("\n");
+    isTooBig(photo, "Photo");
+    isTooBig(psa, "Psa");
+    isTooBig(goodmoral, "Good");
+    if (isGarciano === "yes") isTooBig(brgyPhoto, "Brgy");
 
-    function toggleBarangayUpload() {
-      const isGarciano = document.querySelector('input[name="isGarciano"]:checked')?.value;
-      document.getElementById("barangayUpload").style.display = (isGarciano === "yes") ? "block" : "none";
+    if (errors.length > 0) {
+      statusMsg.textContent = "❌ Please fix file size errors.";
+      return;
     }
 
-    function displayFileSize(inputId, labelId) {
-      const file = document.getElementById(inputId).files[0];
-      const label = document.getElementById(labelId);
-      if (file) {
-        label.textContent = `Size: ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
-      } else {
-        label.textContent = "";
-      }
-    }
+    const upload = async (file, folder) => {
+      if (!file) return null;
+      const ref = storage.ref(`studentApplications/${uid}/${folder}/${Date.now()}_${file.name}`);
+      await ref.put(file);
+      return await ref.getDownloadURL();
+    };
 
-    ["photo", "psa", "goodmoral", "brgyPhoto"].forEach(id => {
-      document.getElementById(id)?.addEventListener("change", () => displayFileSize(id, "size" + id.charAt(0).toUpperCase() + id.slice(1)));
-    });
+    try {
+      const [photoURL, psaURL, goodMoralURL, brgyPhotoURL] = await Promise.all([
+        upload(photo, "2x2"),
+        upload(psa, "psa"),
+        upload(goodmoral, "goodmoral"),
+        isGarciano === "yes" ? upload(brgyPhoto, "barangay") : null
+      ]);
 
-    async function submitAllData() {
-      const statusMsg = document.getElementById("statusMessage");
-      statusMsg.textContent = "Preparing upload...";
-
-      const user = auth.currentUser;
-      if (!user) {
-        alert("You must be logged in first.");
-        return location.href = "student-login.html";
-      }
-
-      const uid = user.uid;
-      const photo = document.getElementById("photo").files[0];
-      const psa = document.getElementById("psa").files[0];
-      const goodmoral = document.getElementById("goodmoral").files[0];
-      const brgyPhoto = document.getElementById("brgyPhoto").files[0];
-      const isGarciano = document.querySelector('input[name="isGarciano"]:checked')?.value || "no";
-
-      const maxSizeMB = 2;
-      const errors = [];
-      const isTooBig = (file, labelId) => {
-        if (file && file.size > maxSizeMB * 1024 * 1024) {
-          document.getElementById("error" + labelId).textContent = `File exceeds ${maxSizeMB}MB limit.`;
-          errors.push(labelId);
-        } else {
-          document.getElementById("error" + labelId).textContent = "";
-        }
+      const completeData = {
+        ...formData,
+        photoURL,
+        psaURL,
+        goodMoralURL,
+        isGarciano,
+        brgyPhotoURL,
+        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
-      if (!photo || !psa) {
-        statusMsg.textContent = "❌ 2x2 Photo and PSA Birth Certificate are required.";
-        return;
-      }
-
-      isTooBig(photo, "Photo");
-      isTooBig(psa, "Psa");
-      isTooBig(goodmoral, "Good");
-      isTooBig(brgyPhoto, "Brgy");
-
-      if (errors.length > 0) {
-        statusMsg.textContent = `❌ Please fix file size errors.`;
-        return;
-      }
-
-      const upload = async (file, folder) => {
-        if (!file) return null;
-        const ref = storage.ref(`studentApplications/${uid}/${folder}/${Date.now()}_${file.name}`);
-        await ref.put(file);
-        return await ref.getDownloadURL();
-      };
-
-      try {
-        const photoURL = await upload(photo, "2x2");
-        const psaURL = await upload(psa, "psa");
-        const goodMoralURL = await upload(goodmoral, "goodmoral");
-        const brgyPhotoURL = isGarciano === "yes" ? await upload(brgyPhoto, "barangay") : null;
-
-        const completeData = {
-          ...formData,
-          photoURL,
-          psaURL,
-          goodMoralURL,
-          isGarciano,
-          brgyPhotoURL,
-          submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-
-        await db.collection("studentApplications").doc(uid).set(completeData);
-        statusMsg.textContent = "✅ Submitted successfully!";
-        localStorage.clear();
-        setTimeout(() => location.href = "student-portal.html", 1500);
-      } catch (error) {
-        console.error(error);
-        statusMsg.textContent = "❌ Upload failed: " + error.message;
-      }
+      await db.collection("studentApplications").doc(uid).set(completeData);
+      statusMsg.textContent = "✅ Submitted successfully!";
+      localStorage.clear();
+      setTimeout(() => (location.href = "student-portal.html"), 1500);
+    } catch (error) {
+      console.error("❌ Upload failed:", error);
+      statusMsg.textContent = "❌ Upload failed: " + error.message;
     }
+  }
 
-    window.addEventListener("DOMContentLoaded", toggleBarangayUpload);
+  window.addEventListener("DOMContentLoaded", toggleBarangayUpload);
+</script>
   </script></body>
 </html>
