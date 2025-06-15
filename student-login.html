@@ -169,40 +169,49 @@
   });
 
   form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
+  e.preventDefault();
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
 
-    try {
-      if (isLogin) {
-        await auth.signInWithEmailAndPassword(email, password);
-      } else {
-        await auth.createUserWithEmailAndPassword(email, password);
-      }
-      localStorage.setItem("studentEmail", email);
-    } catch (error) {
-      errorMsg.textContent = error.message;
+  try {
+    if (isLogin) {
+      await auth.signInWithEmailAndPassword(email, password);
+      errorMsg.style.color = "green";
+      errorMsg.textContent = "✅ Login successful! Redirecting...";
+    } else {
+      await auth.createUserWithEmailAndPassword(email, password);
+      errorMsg.style.color = "green";
+      errorMsg.textContent = "✅ Account created! Redirecting...";
     }
-  });
+    localStorage.setItem("studentEmail", email);
+  } catch (error) {
+    errorMsg.style.color = "red";
+    errorMsg.textContent = error.message;
+  }
+});
 
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      const email = user.email;
-      localStorage.setItem("studentEmail", email);
+  auth.onAuthStateChanged((user) => {
+  if (user) {
+    const email = user.email;
+    localStorage.setItem("studentEmail", email);
 
-      // Check if the student's data exists in Realtime Database
+    // Add small delay for database readiness (optional)
+    setTimeout(() => {
       db.ref("studentApplications")
         .orderByChild("email")
         .equalTo(email)
-        .once("value", snapshot => {
+        .once("value", (snapshot) => {
           if (snapshot.exists()) {
+            // Data exists — go to portal
             window.location.href = "student-portal.html";
           } else {
+            // No data — go to form
             window.location.href = "PGPCform.html";
           }
         });
-    }
-  });
+    }, 1000); // 1 second delay
+  }
+});
 
   function togglePassword() {
     const input = document.getElementById("password");
