@@ -91,8 +91,9 @@
 
 <button id="submitBtn" onclick="submitAllData()">Submit All</button>
 <div class="message" id="statusMessage"></div>
+<pre id="previewArea"></pre>
 
-  </div>  <script>
+<script>
   const firebaseConfig = {
     apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
     authDomain: "flipbook-a5350.firebaseapp.com",
@@ -108,25 +109,74 @@
   const storage = firebase.storage();
 
   const previewArea = document.getElementById("previewArea");
-  const formData = {};
+  const submitBtn = document.getElementById("submitBtn");
+  const statusMsg = document.getElementById("statusMessage");
 
-  for (const key of Object.keys(localStorage)) {
-    if (!key.startsWith("firebase:")) {
-      formData[key] = localStorage.getItem(key);
+  let formData = {};
+  let isSubmitting = false;
+
+  // On page load, check auth and load data from Firestore
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) {
+      alert("You must be logged in first.");
+      location.href = "student-login.html";
+      return;
     }
-  }
 
-  formData.fullName = [formData.firstName, formData.middleName, formData.lastName].filter(Boolean).join(" ");
-  const orderedKeys = [
-    "fullName",
-    "studentCourse",
-    "studentEmail",
-    "studentAddress",
-    "studentSex",
-    "birthDate",
-    "studentNumber"
-  ];
-  previewArea.textContent = orderedKeys.map(key => `${key}: ${formData[key] || ""}`).join("\n");
+    try {
+      const doc = await db.collection("studentApplications").doc(user.uid).get();
+      if (doc.exists) {
+        formData = doc.data();
+
+        // Show preview of data
+        const orderedKeys = [
+          "fullName",
+          "studentCourse",
+          "studentEmail",
+          "studentAddress",
+          "studentSex",
+          "birthDate",
+          "studentNumber"
+        ];
+
+        previewArea.textContent = orderedKeys
+          .map(key => `${key}: ${formData[key] || "(not provided)"}`)
+          .join("\n");
+
+        // Disable submit button because form already submitted
+        submitBtn.disabled = true;
+        statusMsg.textContent = "✅ You have already submitted the form.";
+      } else {
+        // No submission found, try to load from localStorage as fallback (optional)
+        for (const key of Object.keys(localStorage)) {
+          if (!key.startsWith("firebase:")) {
+            formData[key] = localStorage.getItem(key);
+          }
+        }
+        formData.fullName = [formData.firstName, formData.middleName, formData.lastName].filter(Boolean).join(" ");
+
+        const orderedKeys = [
+          "fullName",
+          "studentCourse",
+          "studentEmail",
+          "studentAddress",
+          "studentSex",
+          "birthDate",
+          "studentNumber"
+        ];
+
+        previewArea.textContent = orderedKeys
+          .map(key => `${key}: ${formData[key] || "(not provided)"}`)
+          .join("\n");
+
+        submitBtn.disabled = false;
+        statusMsg.textContent = "Please complete and submit the form.";
+      }
+    } catch (error) {
+      console.error("Error fetching submission data:", error);
+      statusMsg.textContent = "❌ Error loading your data.";
+    }
+  });
 
   function toggleBarangayUpload() {
     const isGarciano = document.querySelector('input[name="isGarciano"]:checked')?.value;
@@ -150,17 +200,12 @@
 
   window.addEventListener("DOMContentLoaded", toggleBarangayUpload);
 
-  let isSubmitting = false;
-
   async function submitAllData() {
     if (isSubmitting) return;
     isSubmitting = true;
 
-    const submitBtn = document.getElementById("submitBtn");
     submitBtn.disabled = true;
     submitBtn.textContent = "Submitting...";
-
-    const statusMsg = document.getElementById("statusMessage");
     statusMsg.textContent = "Preparing upload...";
 
     const user = auth.currentUser;
@@ -168,6 +213,21 @@
       alert("You must be logged in first.");
       location.href = "student-login.html";
       return;
+    }
+
+    // Double check if already submitted before upload
+    try {
+      const doc = await db.collection("studentApplications").doc(user.uid).get();
+      if (doc.exists) {
+        alert("You have already submitted the form.");
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submit All";
+        statusMsg.textContent = "✅ You already submitted the form.";
+        isSubmitting = false;
+        return;
+      }
+    } catch (error) {
+      console.error("Error checking submission status:", error);
     }
 
     const uid = user.uid;
@@ -186,7 +246,7 @@
     const isTooBig = (file, labelId) => {
       const errorEl = document.getElementById("error" + labelId);
       if (file && file.size > maxSizeMB * 1024 * 1024) {
-        errorEl.textContent = `File exceeds ${maxSizeMB}MB limit.`;
+        if (errorEl) errorEl.textContent = `File exceeds ${maxSizeMB}MB limit.`;
         errors.push(labelId);
       } else if (errorEl) {
         errorEl.textContent = "";
@@ -196,7 +256,7 @@
     const isInvalidType = (file, allowedTypes, labelId) => {
       const errorEl = document.getElementById("error" + labelId);
       if (file && !allowedTypes.includes(file.type)) {
-        errorEl.textContent = `Invalid file type.`;
+        if (errorEl) errorEl.textContent = `Invalid file type.`;
         errors.push(labelId);
       } else if (errorEl) {
         errorEl.textContent = "";
@@ -263,7 +323,6 @@
 
   function resetBtn() {
     isSubmitting = false;
-    const submitBtn = document.getElementById("submitBtn");
     submitBtn.disabled = false;
     submitBtn.textContent = "Submit All";
   }
