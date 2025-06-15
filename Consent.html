@@ -91,7 +91,15 @@
 <div class="message" id="statusMessage"></div>
 
 <script>
-  const firebaseConfig = { apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc", authDomain: "flipbook-a5350.firebaseapp.com", projectId: "flipbook-a5350", storageBucket: "flipbook-a5350.appspot.com", messagingSenderId: "570378601966", appId: "1:570378601966:web:96ebb77badba7e33107aff" };
+  const firebaseConfig = {
+    apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
+    authDomain: "flipbook-a5350.firebaseapp.com",
+    projectId: "flipbook-a5350",
+    storageBucket: "flipbook-a5350.appspot.com",
+    messagingSenderId: "570378601966",
+    appId: "1:570378601966:web:96ebb77badba7e33107aff"
+  };
+
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
@@ -115,16 +123,17 @@
       const doc = await db.collection("studentApplications").doc(user.uid).get();
       if (doc.exists) {
         formData = doc.data();
-        const isActuallySubmitted = formData.submittedAt !== undefined;
-
         formData.fullName = formData.fullName || [formData.firstName, formData.middleName, formData.lastName].filter(Boolean).join(" ");
 
         const orderedKeys = ["fullName", "studentCourse", "studentEmail", "studentAddress", "studentSex", "birthDate", "studentNumber"];
         previewArea.textContent = orderedKeys.map(key => `${key}: ${formData[key] || "(not provided)"}`).join("\n");
 
+        const isActuallySubmitted = formData.submittedAt instanceof firebase.firestore.Timestamp;
+
         if (isActuallySubmitted) {
+          const dateStr = formData.submittedAt.toDate().toLocaleString();
           submitBtn.disabled = true;
-          statusMsg.textContent = "✅ You have already submitted the form.";
+          statusMsg.textContent = `✅ You have already submitted the form on ${dateStr}.`;
         } else {
           submitBtn.disabled = false;
           statusMsg.textContent = "⚠️ You have not submitted the final form yet.";
@@ -135,10 +144,11 @@
             formData[key] = localStorage.getItem(key);
           }
         }
-        formData.fullName = [formData.firstName, formData.middleName, formData.lastName].filter(Boolean).join(" ");
 
+        formData.fullName = [formData.firstName, formData.middleName, formData.lastName].filter(Boolean).join(" ");
         const orderedKeys = ["fullName", "studentCourse", "studentEmail", "studentAddress", "studentSex", "birthDate", "studentNumber"];
         previewArea.textContent = orderedKeys.map(key => `${key}: ${formData[key] || "(not provided)"}`).join("\n");
+
         submitBtn.disabled = false;
         statusMsg.textContent = "Please complete and submit the form.";
       }
@@ -280,7 +290,5 @@
     submitBtn.textContent = "Submit All";
   }
 </script>
-
-  </div>
 </body>
 </html>
