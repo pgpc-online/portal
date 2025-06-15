@@ -125,14 +125,26 @@ max-width: 150px;
 
 @media (min-width: 601px) and (max-width: 900px) {
   #fullInfo {
-    font-size: 1.1rem; /* Slightly larger font size for medium screens */
+    font-size: 1rem; /* Slightly larger font size for medium screens */
   }
 }
 
 @media (min-width: 901px) {
   #fullInfo {
-    font-size: 1.2rem; /* Larger font size for larger screens */
+    font-size: 1.1rem; /* Larger font size for larger screens */
   }
+}
+.mode{
+padding: 0.6rem 1rem;
+      border: none;
+      background-color: none;
+      cursor: pointer;
+}
+.note{
+padding: 0.6rem 1rem;
+      border: none;
+      background-color: #FCC03A;
+      cursor: pointer;
 }
 
   </style>
@@ -141,7 +153,7 @@ max-width: 150px;
   <header>
     <h3>PGPC <span style="font-family: 'Michroma', sans-serif; font-size: 20px;">Student</span></h3>
     <div>
-      <button onclick="toggleDarkMode()">🌓</button>
+      <button class="mode" onclick="toggleDarkMode()">🌓</button>
       <button onclick="logout()"> Logout</button>
     </div>
   </header>
@@ -153,20 +165,22 @@ max-width: 150px;
     <div class="info" id="studentInfo">
       <p><strong>Fullname:</strong> <span id="studentName"></span></p>
       <p><strong>Course:</strong> <span id="studentCourse"></span></p>
+<p><strong>Status:</strong>🟡 Pending <span id="pending"></span></p>
       <p><strong>Email:</strong> <span id="studentEmail"></span></p>
       <p><strong>Contact:</strong> <span id="studentContact"></span></p>
       <p><strong>Address:</strong> <span id="studentAddress"></span></p>
       <p><strong>Birthday:</strong> <span id="birthDate"></span></p>
       <p><strong>Gender:</strong> <span id="studentSex"></span></p>
+
     </div>
 
     <button id="viewMoreBtn" onclick="toggleFullInfo()">🔽 View More</button>
     <div id="fullInfo" style="display:none; margin-top: 1rem;"></div>
-
+<hr>
     <div class="notes-section">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <h3>Your Notes</h3>
-        <button onclick="openNoteModal()">➕ Add Note</button>
+        <button class="note" onclick="openNoteModal()">➕ Add Note</button>
       </div>
       <div id="notesList"></div>
     </div>
@@ -296,7 +310,8 @@ max-width: 150px;
         const data = docSnap.data();
         document.getElementById("profilePic").src = data.photoURL || "https://via.placeholder.com/120";
         document.getElementById("studentName").textContent = data.fullName || "Student";
-        document.getElementById("studentEmail").textContent = user.email || "N/A";
+      document.getElementById("studentCourse").textContent = data.studentCourse || "Student";
+  document.getElementById("studentEmail").textContent = user.email || "N/A";
         document.getElementById("studentAddress").textContent = data.studentAddress || "N/A";
         document.getElementById("studentContact").textContent = data.studentNumber || "N/A";
         document.getElementById("birthDate").textContent = data.birthDate || "N/A"; // Added missing field
