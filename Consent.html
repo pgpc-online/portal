@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -8,6 +9,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <style>
+    /* Your original styling retained for layout */
     body {
       font-family: Arial, sans-serif;
       background: #f4f4f4;
@@ -22,11 +24,15 @@
       margin: auto;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-    p {
-      text-align: justify;
-    }
+    p { text-align: justify; }
     h2 { text-align: center; color: #007bff; }
-    .data-preview { background: #f9f9f9; padding: 15px; border-radius: 5px; white-space: pre-wrap; }
+    .data-preview {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 5px;
+      white-space: pre-wrap;
+      margin-bottom: 20px;
+    }
     label { display: block; margin-top: 20px; font-weight: bold; }
     input[type="file"] { width: 100%; margin-top: 5px; }
     .radio-group { display: flex; gap: 15px; margin-top: 10px; }
@@ -54,46 +60,49 @@
       <img src="template/pgpc.png" alt="PGPC" style="width:50px; height: auto;" />
     </div>
     <h2>Consent</h2>
-    <p>I am fully aware that Padre Garcia Polytechnic College is obligated under the Data Privacy Act of 2012 and its Implementing Rules and Regulations (IRR) effective since September 8, 2016, to protect all my personal and sensitive information that it collects, processes, and retains upon my application for admission, enrolment and during my stay in the College...</p><h4>Review your data</h4>
-<div class="data-preview" id="previewArea">Loading data...</div>
+    <p>I am fully aware that Padre Garcia Polytechnic College is obligated under the Data Privacy Act of 2012...</p>
 
-<h2>Upload Requirements</h2>
-<label>Are you a Garciano?</label>
-<div class="radio-group">
-  <label><input type="radio" name="isGarciano" value="yes" onclick="toggleBarangayUpload()"> Yes</label>
-  <label><input type="radio" name="isGarciano" value="no" onclick="toggleBarangayUpload()"> No</label>
-</div>
+    <h4>Review your data</h4>
+    <div class="data-preview" id="previewArea">Loading data...</div>
 
-<div class="conditional-upload" id="barangayUpload">
-  <label>Barangay Residency (PDF/Image)</label>
-  <input type="file" id="brgyPhoto" accept=".pdf,image/*">
-  <div id="sizeBrgy" class="file-size"></div>
-  <div id="errorBrgy" class="error"></div>
-</div>
+    <h2>Upload Requirements</h2>
+    <label>Are you a Garciano?</label>
+    <div class="radio-group">
+      <label><input type="radio" name="isGarciano" value="yes" onclick="toggleBarangayUpload()"> Yes</label>
+      <label><input type="radio" name="isGarciano" value="no" onclick="toggleBarangayUpload()"> No</label>
+    </div>
 
-<label>2x2 Photo (JPG/PNG)</label>
-<input type="file" id="photo" accept="image/*" required>
-<div id="sizePhoto" class="file-size"></div>
-<div id="errorPhoto" class="error"></div>
+    <div class="conditional-upload" id="barangayUpload">
+      <label>Barangay Residency (PDF/Image)</label>
+      <input type="file" id="brgyPhoto" accept=".pdf,image/*">
+      <div id="sizeBrgy" class="file-size"></div>
+      <div id="errorBrgy" class="error"></div>
+    </div>
 
-<label>PSA Birth Certificate (PDF/Image)</label>
-<input type="file" id="psa" accept=".pdf,image/*" required>
-<div id="sizePsa" class="file-size"></div>
-<div id="errorPsa" class="error"></div>
+    <label>2x2 Photo (JPG/PNG)</label>
+    <input type="file" id="photo" accept="image/*" required>
+    <div id="sizePhoto" class="file-size"></div>
+    <div id="errorPhoto" class="error"></div>
 
-<label>Good Moral Certificate (Optional)</label>
-<input type="file" id="goodmoral" accept=".pdf,image/*">
-<div id="sizeGood" class="file-size"></div>
-<div id="errorGood" class="error"></div>
+    <label>PSA Birth Certificate (PDF/Image)</label>
+    <input type="file" id="psa" accept=".pdf,image/*" required>
+    <div id="sizePsa" class="file-size"></div>
+    <div id="errorPsa" class="error"></div>
 
-<h2>Oath</h2>
-<p>I hereby certify that all information supplied in this application form is complete and accurate...</p>
+    <label>Good Moral Certificate (Optional)</label>
+    <input type="file" id="goodmoral" accept=".pdf,image/*">
+    <div id="sizeGood" class="file-size"></div>
+    <div id="errorGood" class="error"></div>
 
-<button id="submitBtn" onclick="submitAllData()">Submit All</button>
-<div class="message" id="statusMessage"></div>
-<pre id="previewArea"></pre>
+    <h2>Oath</h2>
+    <p>I hereby certify that all information supplied in this application form is complete and accurate...</p>
+
+    <button id="submitBtn" onclick="submitAllData()">Submit All</button>
+    <div class="message" id="statusMessage"></div>
+  </div>
 
 <script>
+  // Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
     authDomain: "flipbook-a5350.firebaseapp.com",
@@ -115,7 +124,7 @@
   let formData = {};
   let isSubmitting = false;
 
-  // On page load, check auth and load data from Firestore
+  // Load user data when logged in
   auth.onAuthStateChanged(async (user) => {
     if (!user) {
       alert("You must be logged in first.");
@@ -123,31 +132,25 @@
       return;
     }
 
+    const uid = user.uid;
+
     try {
-      const doc = await db.collection("studentApplications").doc(user.uid).get();
+      const doc = await db.collection("studentApplications").doc(uid).get();
       if (doc.exists) {
         formData = doc.data();
 
-        // Show preview of data
-        const orderedKeys = [
-          "fullName",
-          "studentCourse",
-          "studentEmail",
-          "studentAddress",
-          "studentSex",
-          "birthDate",
-          "studentNumber"
+        const keys = [
+          "fullName", "studentCourse", "studentEmail",
+          "studentAddress", "studentSex", "birthDate", "studentNumber"
         ];
 
-        previewArea.textContent = orderedKeys
+        previewArea.textContent = keys
           .map(key => `${key}: ${formData[key] || "(not provided)"}`)
           .join("\n");
 
-        // Disable submit button because form already submitted
         submitBtn.disabled = true;
         statusMsg.textContent = "✅ You have already submitted the form.";
       } else {
-        // No submission found, try to load from localStorage as fallback (optional)
         for (const key of Object.keys(localStorage)) {
           if (!key.startsWith("firebase:")) {
             formData[key] = localStorage.getItem(key);
@@ -155,25 +158,20 @@
         }
         formData.fullName = [formData.firstName, formData.middleName, formData.lastName].filter(Boolean).join(" ");
 
-        const orderedKeys = [
-          "fullName",
-          "studentCourse",
-          "studentEmail",
-          "studentAddress",
-          "studentSex",
-          "birthDate",
-          "studentNumber"
+        const keys = [
+          "fullName", "studentCourse", "studentEmail",
+          "studentAddress", "studentSex", "birthDate", "studentNumber"
         ];
 
-        previewArea.textContent = orderedKeys
+        previewArea.textContent = keys
           .map(key => `${key}: ${formData[key] || "(not provided)"}`)
           .join("\n");
 
         submitBtn.disabled = false;
         statusMsg.textContent = "Please complete and submit the form.";
       }
-    } catch (error) {
-      console.error("Error fetching submission data:", error);
+    } catch (err) {
+      console.error("Error loading student data:", err);
       statusMsg.textContent = "❌ Error loading your data.";
     }
   });
@@ -210,27 +208,13 @@
 
     const user = auth.currentUser;
     if (!user) {
-      alert("You must be logged in first.");
+      alert("You must be logged in.");
       location.href = "student-login.html";
       return;
     }
 
-    // Double check if already submitted before upload
-    try {
-      const doc = await db.collection("studentApplications").doc(user.uid).get();
-      if (doc.exists) {
-        alert("You have already submitted the form.");
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Submit All";
-        statusMsg.textContent = "✅ You already submitted the form.";
-        isSubmitting = false;
-        return;
-      }
-    } catch (error) {
-      console.error("Error checking submission status:", error);
-    }
-
     const uid = user.uid;
+
     const photo = document.getElementById("photo").files[0];
     const psa = document.getElementById("psa").files[0];
     const goodmoral = document.getElementById("goodmoral").files[0];
@@ -240,44 +224,32 @@
     const maxSizeMB = 5;
     const errors = [];
 
-    const allowedImages = ['image/jpeg', 'image/png'];
-    const allowedDocs = ['application/pdf', 'image/jpeg', 'image/png'];
-
-    const isTooBig = (file, labelId) => {
+    function validateFile(file, labelId, types) {
       const errorEl = document.getElementById("error" + labelId);
       if (file && file.size > maxSizeMB * 1024 * 1024) {
-        if (errorEl) errorEl.textContent = `File exceeds ${maxSizeMB}MB limit.`;
+        errorEl.textContent = `File exceeds ${maxSizeMB}MB limit.`;
         errors.push(labelId);
-      } else if (errorEl) {
+      } else if (file && !types.includes(file.type)) {
+        errorEl.textContent = `Invalid file type.`;
+        errors.push(labelId);
+      } else {
         errorEl.textContent = "";
       }
-    };
-
-    const isInvalidType = (file, allowedTypes, labelId) => {
-      const errorEl = document.getElementById("error" + labelId);
-      if (file && !allowedTypes.includes(file.type)) {
-        if (errorEl) errorEl.textContent = `Invalid file type.`;
-        errors.push(labelId);
-      } else if (errorEl) {
-        errorEl.textContent = "";
-      }
-    };
+    }
 
     if (!photo || !psa) {
-      statusMsg.textContent = "❌ 2x2 Photo and PSA Birth Certificate are required.";
+      statusMsg.textContent = "❌ Required documents are missing.";
       resetBtn();
       return;
     }
 
-    isTooBig(photo, "Photo");
-    isTooBig(psa, "Psa");
-    if (goodmoral) isTooBig(goodmoral, "Good");
-    if (isGarciano === "yes" && brgyPhoto) isTooBig(brgyPhoto, "Brgy");
+    const imgTypes = ['image/jpeg', 'image/png'];
+    const docTypes = ['application/pdf', ...imgTypes];
 
-    isInvalidType(photo, allowedImages, "Photo");
-    isInvalidType(psa, allowedDocs, "Psa");
-    if (goodmoral) isInvalidType(goodmoral, allowedDocs, "Good");
-    if (isGarciano === "yes" && brgyPhoto) isInvalidType(brgyPhoto, allowedDocs, "Brgy");
+    validateFile(photo, "Photo", imgTypes);
+    validateFile(psa, "Psa", docTypes);
+    if (goodmoral) validateFile(goodmoral, "Good", docTypes);
+    if (isGarciano === "yes" && brgyPhoto) validateFile(brgyPhoto, "Brgy", docTypes);
 
     if (errors.length > 0) {
       statusMsg.textContent = "❌ Please fix the errors above.";
@@ -314,9 +286,9 @@
       statusMsg.textContent = "✅ Submitted successfully!";
       localStorage.clear();
       setTimeout(() => (location.href = "student-portal.html"), 1500);
-    } catch (error) {
-      console.error("❌ Upload failed:", error);
-      statusMsg.textContent = "❌ Upload failed: " + error.message;
+    } catch (err) {
+      console.error("❌ Upload failed:", err);
+      statusMsg.textContent = "❌ Upload failed: " + err.message;
       resetBtn();
     }
   }
