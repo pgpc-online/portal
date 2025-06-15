@@ -297,12 +297,10 @@
     appId: "1:570378601966:web:96ebb77badba7e33107aff"
   };
 
-  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
   const auth = firebase.auth();
 
-  // Form submission handler
   async function saveData(event) {
     event.preventDefault();
 
@@ -313,19 +311,17 @@
     const mobileNumber = document.getElementById("studentNumber").value.trim();
     const email = document.getElementById("studentEmail").value.trim();
 
-    // Validate mobile number
+    // Validation
     if (!/^\d{11}$/.test(mobileNumber)) {
       document.getElementById("mobileError").style.display = "block";
       return;
     }
 
-    // Validate email address
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       document.getElementById("emailError").style.display = "block";
       return;
     }
 
-    // Collect form data
     const form = document.getElementById("applicationForm");
     const formData = new FormData(form);
     const dataObject = {};
@@ -334,39 +330,29 @@
       dataObject[key] = value;
     });
 
-    // Collect selected radio button values
+    // Radio button values
     dataObject.familyIncome = form.querySelector('input[name="familyIncome"]:checked')?.value || "";
     dataObject.member = form.querySelector('input[name="member"]:checked')?.value || "";
     dataObject.special = form.querySelector('input[name="special"]:checked')?.value || "";
 
-    // Add server timestamp
-    dataObject.submittedAt = firebase.firestore.FieldValue.serverTimestamp();
-
     try {
       document.getElementById("loading").style.display = "block";
 
-      // Get current authenticated user
       const currentUser = auth.currentUser;
+      if (!currentUser) throw new Error("User not logged in.");
 
-      if (!currentUser) {
-        throw new Error("User not logged in. Please log in again.");
-      }
-
-      // Save all form data to a doc with user's UID in studentApplications
+      // ❗ Save partial data only — NO `submittedAt`, NO `formSubmitted`
       await db.collection("studentApplications").doc(currentUser.uid).set({
         ...dataObject,
-        formSubmitted: true,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      }, { merge: true });
 
       document.getElementById("loading").style.display = "none";
       document.getElementById("successMsg").style.display = "block";
 
-      // Redirect after success
       setTimeout(() => {
         window.location.href = "Consent.html";
       }, 2000);
-
     } catch (error) {
       document.getElementById("loading").style.display = "none";
       alert("❌ Error saving data. Please try again.");
@@ -374,7 +360,6 @@
     }
   }
 
-  // Attach submit event listener on DOM load
   document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("applicationForm");
     if (form) {
