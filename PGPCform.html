@@ -282,10 +282,13 @@
   </div>
 
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+ <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
- <script>
+<script>
+  // Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
     authDomain: "flipbook-a5350.firebaseapp.com",
@@ -295,70 +298,87 @@
     appId: "1:570378601966:web:96ebb77badba7e33107aff"
   };
 
+  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
+  const auth = firebase.auth();
 
+  // Form submission handler
   async function saveData(event) {
     event.preventDefault();
 
-    // Reset errors
+    // Hide error messages
     document.getElementById("mobileError").style.display = "none";
     document.getElementById("emailError").style.display = "none";
 
     const mobileNumber = document.getElementById("studentNumber").value.trim();
     const email = document.getElementById("studentEmail").value.trim();
 
-    // Basic validation
+    // Validate mobile number
     if (!/^\d{11}$/.test(mobileNumber)) {
       document.getElementById("mobileError").style.display = "block";
       return;
     }
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
+
+    // Validate email address
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       document.getElementById("emailError").style.display = "block";
       return;
     }
 
+    // Collect form data
     const form = document.getElementById("applicationForm");
-    const data = new FormData(form);
-    const obj = {};
-    data.forEach((v, k) => { obj[k] = v; });
+    const formData = new FormData(form);
+    const dataObject = {};
 
-    // Capture unchecked radio values
-    obj.familyIncome = form.querySelector('input[name="familyIncome"]:checked')?.value || "";
-    obj.member       = form.querySelector('input[name="member"]:checked')?.value || "";
-    obj.special      = form.querySelector('input[name="special"]:checked')?.value || "";
+    formData.forEach((value, key) => {
+      dataObject[key] = value;
+    });
 
-    // Add timestamp & UID if available
-    obj.submittedAt = firebase.firestore.FieldValue.serverTimestamp();
+    // Collect selected radio button values
+    dataObject.familyIncome = form.querySelector('input[name="familyIncome"]:checked')?.value || "";
+    dataObject.member = form.querySelector('input[name="member"]:checked')?.value || "";
+    dataObject.special = form.querySelector('input[name="special"]:checked')?.value || "";
+
+    // Add server timestamp
+    dataObject.submittedAt = firebase.firestore.FieldValue.serverTimestamp();
 
     try {
       document.getElementById("loading").style.display = "block";
-      await db.collection("applications").add(obj);
+
+      // Save to 'applications' collection
+      await db.collection("applications").add(dataObject);
+
       document.getElementById("loading").style.display = "none";
       document.getElementById("successMsg").style.display = "block";
 
-      // Optional: mark in studentApplications
-      const uid = firebase.auth()?.currentUser?.uid;
-      if (uid) {
-        db.collection("studentApplications").doc(uid).update({
+      // Update user's application status (if authenticated)
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        await db.collection("studentApplications").doc(currentUser.uid).set({
           formSubmitted: true,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).catch(() => {});
+        }, { merge: true });
       }
 
+      // Redirect after success
       setTimeout(() => {
         window.location.href = "Consent.html";
       }, 2000);
-    } catch (err) {
+
+    } catch (error) {
       document.getElementById("loading").style.display = "none";
-      alert("Error saving data. Please try again.");
-      console.error(err);
+      alert("❌ Error saving data. Please try again.");
+      console.error("Error saving application:", error);
     }
   }
 
-  // ✅ Attach the event listener to the form
+  // Attach submit event listener on DOM load
   document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("applicationForm").addEventListener("submit", saveData);
+    const form = document.getElementById("applicationForm");
+    if (form) {
+      form.addEventListener("submit", saveData);
+    }
   });
 </script>
 </body>
