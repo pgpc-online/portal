@@ -264,14 +264,15 @@
       ]);
 
       const completeData = {
-        ...formData,
-        photoURL,
-        psaURL,
-        goodMoralURL,
-        isGarciano,
-        brgyPhotoURL,
-        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
+  ...formData,
+  photoURL,
+  psaURL,
+  goodMoralURL,
+  isGarciano,
+  brgyPhotoURL,
+  submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  formSubmitted: true
+};
 
       await db.collection("studentApplications").doc(uid).set(completeData);
       statusMsg.textContent = "✅ Submitted successfully!";
