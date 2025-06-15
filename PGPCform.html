@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet" />
   <title>Student Application Form</title>
-    <style>
+     <style>
     * {
       margin: 0;
       padding: 0;
@@ -110,6 +110,9 @@
       font-size: 13px;
       color: #6c757d;
     }
+  .error-message { color: red; font-size: 14px; margin-top: 5px; display: none; }
+    #loading { display: none; text-align: center; color: #007bff; margin-top: 20px; }
+    #successMsg { display: none; text-align: center; color: green; margin-top: 20px; }
   </style>
 </head>
 
@@ -123,215 +126,235 @@
 
 <div class="container">
   <h3>I. STUDENT INFORMATION</h3>
-  <form id="applicationForm" onsubmit="return saveData(event)" action="Consent.html">
-    <label for="studentCourse">Program (Course):</label>
-    <select name="studentCourse" id="studentCourse" required>
-      <option value="" disabled selected>Select Course</option>
-      <option>BS Computer Science</option>
-      <option>B Public Administration</option>
-      <option>BS Criminology</option>
-      <option>BS Management Accountancy</option>
-    </select>
+    <form id="applicationForm">
+      <!-- Student Program -->
+      <label for="studentCourse">Program (Course):</label>
+      <select id="studentCourse" name="studentCourse" required>
+        <option value="" disabled selected>Select Course</option>
+        <option>BS Computer Science</option>
+        <option>B Public Administration</option>
+        <option>BS Criminology</option>
+        <option>BS Management Accountancy</option>
+      </select>
 
-    <label for="lastName">Last Name:</label>
-    <input type="text" id="lastName" required>
+      <!-- Name fields -->
+      <label for="lastName">Last Name:</label>
+      <input type="text" id="lastName" name="lastName" required>
 
-    <label for="firstName">First Name:</label>
-    <input type="text" id="firstName" required>
+      <label for="firstName">First Name:</label>
+      <input type="text" id="firstName" name="firstName" required>
 
-    <label for="middleName">Middle Name:</label>
-    <input type="text" id="middleName" required>
+      <label for="middleName">Middle Name:</label>
+      <input type="text" id="middleName" name="middleName" required>
 
-    <label for="studentDate">Date of Birth:</label>
-    <input type="date" name="studentDate" id="studentDate" required>
+      <!-- Date and place of birth -->
+      <label for="birthDate">Date of Birth:</label>
+      <input type="date" id="birthDate" name="birthDate" required>
 
-    <label for="studentBirthPlace">Place of Birth:</label>
-    <input type="text" name="studentBirthPlace" id="studentBirthPlace" required>
+      <label for="studentBirthPlace">Place of Birth:</label>
+      <input type="text" id="studentBirthPlace" name="studentBirthPlace" required>
 
-    <label for="studentSex">Sex:</label>
-    <select name="studentSex" id="studentSex" required>
-      <option value="" disabled selected>Select Sex</option>
-      <option>Male</option>
-      <option>Female</option>
-    </select>
+      <!-- Sex and status -->
+      <label for="studentSex">Sex:</label>
+      <select id="studentSex" name="studentSex" required>
+        <option value="" disabled selected>Select Sex</option>
+        <option>Male</option><option>Female</option>
+      </select>
 
-    <label for="studentStatus">Civil Status:</label>
-    <select name="studentStatus" id="studentStatus" required>
-      <option value="" disabled selected>Select Status</option>
-      <option>Single</option>
-      <option>Married</option>
-      <option>Widower</option>
-    </select>
+      <label for="civilStatus">Civil Status:</label>
+      <select id="civilStatus" name="civilStatus" required>
+        <option value="" disabled selected>Select Status</option>
+        <option>Single</option><option>Married</option><option>Widower</option>
+      </select>
 
-    <label for="studentReligion">Religion:</label>
-    <input type="text" name="studentReligion" id="studentReligion" required>
+      <label for="studentReligion">Religion:</label>
+      <input type="text" id="studentReligion" name="studentReligion" required>
 
-    <label for="studentCitizenship">Citizenship:</label>
-    <input type="text" name="studentCitizenship" id="studentCitizenship" required>
+      <label for="studentCitizenship">Citizenship:</label>
+      <input type="text" id="studentCitizenship" name="studentCitizenship" required>
 
-    <label>Mobile No.:</label>
-    <input type="text" id="studentNumber" name="studentNumber" placeholder="e.g., 09171234567" inputmode="numeric" required>
-    <div class="error-message" id="mobileError">Please enter a valid 11-digit mobile number.</div>
+      <label for="studentNumber">Mobile No.:</label>
+      <input type="text" id="studentNumber" name="studentNumber" placeholder="09171234567" inputmode="numeric" required>
+      <div class="error-message" id="mobileError">Please enter a valid 11-digit mobile number.</div>
 
-    <label for="studentEmail">Email Address:</label>
-    <input type="email" name="studentEmail" id="studentEmail" required>
-    <div class="error-message" id="emailError">Please enter a valid email address containing '@'.</div>
+      <label for="studentEmail">Email Address:</label>
+      <input type="email" id="studentEmail" name="studentEmail" required>
+      <div class="error-message" id="emailError">Please enter a valid email address.</div>
 
-    <label for="studentAddress">Permanent Address:</label>
-    <input type="text" name="studentAddress" id="studentAddress" required>
+      <label for="studentAddress">Permanent Address:</label>
+      <input type="text" id="studentAddress" name="studentAddress" required>
 
-    <label for="studentPostal">Postal Code:</label>
-    <input type="tel" name="studentPostal" id="studentPostal" pattern="[0-9]{4,6}" required>
+      <label for="studentPostal">Postal Code:</label>
+      <input type="tel" id="studentPostal" name="studentPostal" pattern="[0-9]{4,6}" required>
 
-    <h3>II. FAMILY BACKGROUND</h3>
-    <label for="fatherName">Father's Name:</label>
-    <input type="text" name="fatherName" id="fatherName" required />
+      <!-- Family Background -->
+      <h3>II. FAMILY BACKGROUND</h3>
+      <label for="fatherName">Father's Name:</label>
+      <input type="text" id="fatherName" name="fatherName" required>
 
-    <label for="fatherOccupation">Occupation:</label>
-    <input type="text" name="fatherOccupation" id="fatherOccupation" required />
+      <label for="fatherOccupation">Occupation:</label>
+      <input type="text" id="fatherOccupation" name="fatherOccupation" required>
 
-    <label for="fatherNumber">Contact No./s:</label>
-    <input type="tel" name="fatherNumber" id="fatherNumber" pattern="[0-9]{10,15}" required />
+      <label for="fatherNumber">Contact No./s:</label>
+      <input type="tel" id="fatherNumber" name="fatherNumber" pattern="[0-9]{10,15}" required>
 
-    <label for="motherName">Mother's Maiden Name:</label>
-    <input type="text" name="motherName" id="motherName" required />
+      <label for="motherName">Mother's Maiden Name:</label>
+      <input type="text" id="motherName" name="motherName" required>
 
-    <label for="motherOccupation">Occupation:</label>
-    <input type="text" name="motherOccupation" id="motherOccupation" required />
+      <label for="motherOccupation">Occupation:</label>
+      <input type="text" id="motherOccupation" name="motherOccupation" required>
 
-    <label for="motherNumber">Contact No./s:</label>
-    <input type="tel" name="motherNumber" id="motherNumber" pattern="[0-9]{10,15}" required />
+      <label for="motherNumber">Contact No./s:</label>
+      <input type="tel" id="motherNumber" name="motherNumber" pattern="[0-9]{10,15}" required>
 
-    <label for="guardianName">Guardian's Name:</label>
-    <input type="text" name="guardianName" id="guardianName" required />
+      <label for="guardianName">Guardian's Name:</label>
+      <input type="text" id="guardianName" name="guardianName" required>
 
-    <label for="guardianOccupation">Guardian's Occupation:</label>
-    <input type="text" name="guardianOccupation" id="guardianOccupation" required />
+      <label for="guardianOccupation">Guardian's Occupation:</label>
+      <input type="text" id="guardianOccupation" name="guardianOccupation" required>
 
-    <label for="guardianNumber">Contact No./s:</label>
-    <input type="tel" name="guardianNumber" id="guardianNumber" pattern="[0-9]{10,15}" required />
+      <label for="guardianNumber">Contact No./s:</label>
+      <input type="tel" id="guardianNumber" name="guardianNumber" pattern="[0-9]{10,15}" required>
 
-    <label>Average Family Income:</label>
-    <div class="radio-group">
-      <label><input type="radio" name="familyIncome" value="below10k" required /> 10,000 and below</label>
-      <label><input type="radio" name="familyIncome" value="10kto20k" /> 10,001 - 20,000</label>
-      <label><input type="radio" name="familyIncome" value="20kto30k" /> 20,001 - 30,000</label>
-      <label><input type="radio" name="familyIncome" value="30kto40k" /> 30,001 - 40,000</label>
-      <label><input type="radio" name="familyIncome" value="40kto50k" /> 40,001 - 50,000</label>
-      <label><input type="radio" name="familyIncome" value="50kto100k" /> 50,001 - 100,000</label>
-      <label><input type="radio" name="familyIncome" value="100kAbove" /> 100,001 - Above</label>
-    </div>
+      <label>Average Family Income:</label>
+      <div class="radio-group">
+        <label><input type="radio" name="familyIncome" value="below10k" required /> 10,000 and below</label>
+        <label><input type="radio" name="familyIncome" value="10kto20k" /> 10,001–20,000</label>
+        <label><input type="radio" name="familyIncome" value="20kto30k" /> 20,001–30,000</label>
+        <label><input type="radio" name="familyIncome" value="30kto40k" /> 30,001–40,000</label>
+        <label><input type="radio" name="familyIncome" value="40kto50k" /> 40,001–50,000</label>
+        <label><input type="radio" name="familyIncome" value="50kto100k" /> 50,001–100,000</label>
+        <label><input type="radio" name="familyIncome" value="100kAbove" /> 100,001 and above</label>
+      </div>
 
-    <h3>III. EDUCATIONAL BACKGROUND</h3>
-    <label for="strand">Senior High School strand:</label>
-    <input type="text" name="strand" id="strand" required />
+      <!-- Educational Background -->
+      <h3>III. EDUCATIONAL BACKGROUND</h3>
+      <label for="strand">Senior High School Strand:</label>
+      <input type="text" id="strand" name="strand" required>
 
-    <label for="sname">SHS name:</label>
-    <input type="text" name="sname" id="sname" required />
+      <label for="sname">SHS Name:</label>
+      <input type="text" id="sname" name="sname" required>
 
-    <label for="saddress">Address <i>(Brgy. City, Town)</i>:</label>
-    <input type="text" name="saddress" id="saddress" required />
+      <label for="saddress">Address:</label>
+      <input type="text" id="saddress" name="saddress" required>
 
-    <label for="inclusiveDates">School Year:</label>
-    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
-      <input type="number" name="startDate" id="startDate" min="1900" max="2099" style="height: 35px;" required>
-      <span> – </span>
-      <input type="number" name="endDate" id="endDate" min="1900" max="2099" style="height: 35px;" required>
-    </div>
+      <label>School Year:</label>
+      <div style="display:flex;gap:10px;">
+        <input type="number" id="startDate" name="startDate" min="1900" max="2099" required>
+        <span>–</span>
+        <input type="number" id="endDate" name="endDate" min="1900" max="2099" required>
+      </div>
 
-    <label for="college">College (if any)/ALS GRADUATE:</label>
-    <i style="font-size: 15px;">*Leave blank if not applicable </i>
-    <input type="text" name="college" id="college" />
+      <label for="college">College (if any) / ALS Graduate:</label>
+      <input type="text" id="college" name="college">
+      <label for="cname">School Name:</label>
+      <input type="text" id="cname" name="cname">
+      <label for="caddress">Address:</label>
+      <input type="text" id="caddress" name="caddress">
+      <label>School Year:</label>
+      <div style="display:flex;gap:10px;">
+        <input type="number" id="cstartDate" name="cstartDate" min="1900" max="2099">
+        <span>–</span>
+        <input type="number" id="cendDate" name="cendDate" min="1900" max="2099">
+      </div>
+      <label for="cprogram">Program:</label>
+      <input type="text" id="cprogram" name="cprogram">
 
-    <label for="cname">School name:</label>
-    <input type="text" name="cname" id="cname"/>
+      <label>Member of Cultural Minority Group?</label>
+      <div class="radio-group">
+        <label><input type="radio" name="member" value="yes" required /> Yes</label>
+        <label><input type="radio" name="member" value="no" /> No</label>
+      </div>
 
-    <label for="caddress">Address <i>(Brgy. City, Town)</i>:</label>
-    <input type="text" name="caddress" id="caddress" />
+      <label>Do you have any physical disability or condition?</label>
+      <div class="radio-group">
+        <label><input type="radio" name="special" value="yes" required /> Yes</label>
+        <label><input type="radio" name="special" value="no" /> No</label>
+      </div>
 
-    <label for="cinclusiveDates">School Year:</label>
-    <div style="display: flex; gap: 10px; align-items: center;">
-      <input type="number" name="cstartDate" id="cstartDate" min="1900" max="2099" style="height: 35px;">
-      <span> – </span>
-      <input type="number" name="cendDate" id="cendDate" min="1900" max="2099" style="height: 35px;">
-    </div>
+      <div class="buttonContainer">
+        <button type="submit">Next</button>
+      </div>
 
-    <label for="cprogram">Program:</label>
-    <input type="text" name="cprogram" id="cprogram" />
+      <div id="loading">Saving...</div>
+      <div id="successMsg">✅ Saved! Redirecting...</div>
+    </form>
+  </div>
 
-    <label>Member of Cultural Minority Group?</label>
-    <div class="radio-group">
-      <label><input type="radio" name="member" value="yes" required /> Yes</label>
-      <label><input type="radio" name="member" value="no" /> No</label>
-    </div>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-    <label>Do you have any physical disability or condition that requires special attention?</label>
-    <div class="radio-group">
-      <label><input type="radio" name="special" value="yes" required /> Yes</label>
-      <label><input type="radio" name="special" value="no" /> No</label>
-    </div>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
+      authDomain: "flipbook-a5350.firebaseapp.com",
+      projectId: "flipbook-a5350",
+      storageBucket: "flipbook-a5350.appspot.com",
+      messagingSenderId: "570378601966",
+      appId: "1:570378601966:web:96ebb77badba7e33107aff"
+    };
 
-    <div class="buttonContainer">
-      <button type="submit">Next</button>
-    </div>
-  </form>
-</div>
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    async function saveData(event) {
+      event.preventDefault();
 
-<script>
-   config
-  const firebaseConfig = {
-    apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",  
-      authDomain: "flipbook-a5350.firebaseapp.com",  
-      projectId: "flipbook-a5350",  
-      storageBucket: "flipbook-a5350.appspot.com",  
-      messagingSenderId: "570378601966",  
-      appId: "1:570378601966:web:96ebb77badba7e33107aff"  
-    };  
+      // Reset errors
+      document.getElementById("mobileError").style.display = "none";
+      document.getElementById("emailError").style.display = "none";
 
-  
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+      const mobileNumber = document.getElementById("studentNumber").value.trim();
+      const email = document.getElementById("studentEmail").value.trim();
 
-  async function saveData(event) {
-    event.preventDefault();
+      // Basic validation
+      if (!/^\d{11}$/.test(mobileNumber)) {
+        document.getElementById("mobileError").style.display = "block";
+        return;
+      }
+      if (!/^\S+@\S+\.\S+$/.test(email)) {
+        document.getElementById("emailError").style.display = "block";
+        return;
+      }
 
-    document.getElementById("mobileError").style.display = "none";
-    document.getElementById("emailError").style.display = "none";
+      const form = document.getElementById("applicationForm");
+      const data = new FormData(form);
+      const obj = {};
+      data.forEach((v, k) => { obj[k] = v; });
 
-    const mobileNumber = document.getElementById("studentNumber").value;
-    const email = document.getElementById("studentEmail").value;
+      // Capture unchecked radio values
+      obj.familyIncome = form.querySelector('input[name="familyIncome"]:checked')?.value || "";
+      obj.member       = form.querySelector('input[name="member"]:checked')?.value || "";
+      obj.special      = form.querySelector('input[name="special"]:checked')?.value || "";
 
-    if (!/^\d{11}$/.test(mobileNumber)) {
-      document.getElementById("mobileError").style.display = "block";
-      return false;
+      // Add timestamp & UID if available
+      obj.submittedAt = firebase.firestore.FieldValue.serverTimestamp();
+
+      try {
+        document.getElementById("loading").style.display = "block";
+        await db.collection("applications").add(obj);
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("successMsg").style.display = "block";
+
+        // Optional: mark in studentApplications
+        const uid = firebase.auth()?.currentUser?.uid;
+        if (uid) {
+          db.collection("studentApplications").doc(uid).update({
+            formSubmitted: true,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }).catch(() => {});
+        }
+
+        setTimeout(() => {
+          window.location.href = "Consent.html";
+        }, 2000);
+      } catch (err) {
+        document.getElementById("loading").style.display = "none";
+        alert("Error saving data. Please try again.");
+        console.error(err);
+      }
     }
-
-    if (!email.includes('@')) {
-      document.getElementById("emailError").style.display = "block";
-      return false;
-    }
-
-    const form = document.getElementById('applicationForm');
-    const formData = new FormData(form);
-    const formObject = {};
-
-    formData.forEach((value, key) => {
-      formObject[key] = value;
-    });
-
-    try {
-      await db.collection("applications").add(formObject);
-      window.location.href = "Consent.html";
-    } catch (error) {
-      console.error("Firestore Error:", error);
-      alert("Error saving data. Please try again.");
-    }
-  }
-</script>
-
+  </script>
 </body>
 </html>
