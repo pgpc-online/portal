@@ -2,6 +2,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
+   
   <title>Student Portal</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
@@ -110,10 +112,10 @@
 </head>
 <body>
   <header>
-    <h3>PGPC Student</h3>
+    <h3>PGPC <span style="font-family: 'Michroma', sans-serif; font-size: 20px;">Student<span></h3>
     <div>
       <button onclick="toggleDarkMode()">🌓</button>
-      <button onclick="logout()">🚪 Logout</button>
+      <button onclick="logout()"> Logout</button>
     </div>
   </header>  <div class="container">
     <img id="profilePic" class="profile-pic" src="" alt="Profile Photo" />
