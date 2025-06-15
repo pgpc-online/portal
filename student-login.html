@@ -6,111 +6,64 @@
   <title>Student Login</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <style>
     :root {
-      --bg: #f0f2f5;
-      --text: #111;
-      --card: #fff;
-      --primary: #3f51b5;
+      --bg: #f0f2f5; --text: #111; --card: #fff; --primary: #3f51b5;
     }
     [data-theme="dark"] {
-      --bg: #121212;
-      --text: #fff;
-      --card: #1e1e1e;
-      --primary: #90caf9;
+      --bg: #121212; --text: #fff; --card: #1e1e1e; --primary: #90caf9;
     }
-
     * { box-sizing: border-box; }
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      margin: 0; padding: 0; display: flex; align-items: center;
+      justify-content: center; height: 100vh;
       transition: background 0.3s, color 0.3s;
     }
     .card {
-      background: var(--card);
-      padding: 40px 30px;
-      width: 100%;
-      max-width: 400px;
+      background: var(--card); padding: 40px 30px;
+      width: 100%; max-width: 400px;
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      opacity: 0;
-      animation: fadeIn 1s forwards 0.5s;
+      opacity: 0; animation: fadeIn 1s forwards 0.5s;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    .card h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: var(--primary);
-    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .card h2 { text-align: center; margin-bottom: 20px; color: var(--primary); }
     .card input {
       width: 100%; padding: 12px; margin: 10px 0;
       border-radius: 8px; border: 1px solid #ccc;
-      font-size: 16px;
-      background: transparent;
-      color: var(--text);
+      font-size: 16px; background: transparent; color: var(--text);
     }
     .card input:focus {
-      border-color: var(--primary);
-      outline: none;
+      border-color: var(--primary); outline: none;
     }
     .card button {
       width: 100%; background: var(--primary); color: white;
       border: none; padding: 12px; margin-top: 10px;
-      border-radius: 8px; font-size: 16px;
-      cursor: pointer;
+      border-radius: 8px; font-size: 16px; cursor: pointer;
     }
-    .card button:hover {
-      background: #303f9f;
-    }
+    .card button:hover { background: #303f9f; }
     .card small {
-      display: block;
-      margin-top: 15px;
-      text-align: center;
-      color: var(--primary);
-      cursor: pointer;
+      display: block; margin-top: 15px;
+      text-align: center; color: var(--primary); cursor: pointer;
     }
     #errorMsg {
-      color: red;
-      margin-top: 10px;
-      text-align: center;
-      font-size: 14px;
+      color: red; margin-top: 10px;
+      text-align: center; font-size: 14px;
     }
     .toggle-password {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      font-size: 18px;
-      color: #777;
-      user-select: none;
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%); cursor: pointer;
+      font-size: 18px; color: #777; user-select: none;
     }
-    .toggle-password:hover {
-      color: var(--primary);
-    }
-    .password-wrapper {
-      position: relative;
-    }
+    .toggle-password:hover { color: var(--primary); }
+    .password-wrapper { position: relative; }
     .theme-toggle {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      font-size: 20px;
-      color: var(--primary);
+      position: absolute; top: 20px; right: 20px;
+      cursor: pointer; background: none; border: none;
+      font-size: 20px; color: var(--primary);
     }
   </style>
 </head>
@@ -119,6 +72,7 @@
 <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
 
 <div class="card">
+
   <h2 id="formTitle">Student Login</h2>
   <form id="authForm">
     <input type="email" id="email" placeholder="Enter your email" required />
@@ -133,11 +87,10 @@
 </div>
 
 <script>
-  // Firebase configuration
+  // Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyB9oTiiW5iXfiDgcyrEktTBkEh1ZFmZ7Pc",
     authDomain: "flipbook-a5350.firebaseapp.com",
-    databaseURL: "https://flipbook-a5350-default-rtdb.firebaseio.com",
     projectId: "flipbook-a5350",
     storageBucket: "flipbook-a5350.appspot.com",
     messagingSenderId: "570378601966",
@@ -145,9 +98,10 @@
     measurementId: "G-LCKP7BY0L7"
   };
 
+  // Init Firebase
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
-  const db = firebase.database();
+  const db = firebase.firestore();
 
   const form = document.getElementById("authForm");
   const emailInput = document.getElementById("email");
@@ -182,6 +136,15 @@
         errorMsg.textContent = "✅ Login successful! Redirecting...";
       } else {
         userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // Save to Firestore with basic fields
+        await db.collection("studentApplications").doc(user.uid).set({
+          email: user.email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          status: "new"
+        });
+
         errorMsg.style.color = "green";
         errorMsg.textContent = "✅ Account created! Redirecting...";
       }
@@ -190,19 +153,19 @@
       const emailAddress = user.email;
       localStorage.setItem("studentEmail", emailAddress);
 
-      // Redirect based on studentApplications
+      // Show "taking too long" fallback
       const redirectTimeout = setTimeout(() => {
         errorMsg.textContent = "⚠️ Taking too long. Redirecting to form...";
         window.location.href = "PGPCform.html";
       }, 7000);
 
-      db.ref("studentApplications")
-        .orderByChild("email")
-        .equalTo(emailAddress)
-        .once("value")
-        .then((snapshot) => {
+      // Firestore query
+      db.collection("studentApplications")
+        .where("email", "==", emailAddress)
+        .get()
+        .then((querySnapshot) => {
           clearTimeout(redirectTimeout);
-          if (snapshot.exists()) {
+          if (!querySnapshot.empty) {
             window.location.href = "student-portal.html";
           } else {
             window.location.href = "PGPCform.html";
@@ -236,13 +199,9 @@
 
   function toggleTheme() {
     const currentTheme = document.documentElement.getAttribute("data-theme");
-    if (currentTheme === "dark") {
-      document.documentElement.setAttribute("data-theme", "light");
-      localStorage.setItem("theme", "light");
-    } else {
-      document.documentElement.setAttribute("data-theme", "dark");
-      localStorage.setItem("theme", "dark");
-    }
+    const nextTheme = currentTheme === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", nextTheme);
+    localStorage.setItem("theme", nextTheme);
   }
 
   // Load saved theme
