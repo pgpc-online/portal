@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet" />
   <title>Student Application Form</title>
-  <style>
+    <style>
     * {
       margin: 0;
       padding: 0;
@@ -277,39 +277,59 @@
   </form>
 </div>
 
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <script>
-  function saveData(event) {
+  // Replace with your actual Firebase config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  async function saveData(event) {
     event.preventDefault();
 
-    // Clear previous error messages
     document.getElementById("mobileError").style.display = "none";
     document.getElementById("emailError").style.display = "none";
 
     const mobileNumber = document.getElementById("studentNumber").value;
     const email = document.getElementById("studentEmail").value;
 
-    // Validate mobile number (11 digits)
     if (!/^\d{11}$/.test(mobileNumber)) {
       document.getElementById("mobileError").style.display = "block";
       return false;
     }
 
-    // Validate email (must contain '@')
     if (!email.includes('@')) {
       document.getElementById("emailError").style.display = "block";
       return false;
     }
 
-    // If validations pass, save data to localStorage
     const form = document.getElementById('applicationForm');
     const formData = new FormData(form);
+    const formObject = {};
 
     formData.forEach((value, key) => {
-      localStorage.setItem(key, value); // Store each field dine
+      formObject[key] = value;
     });
 
-    // Redirect to Consent.html
-    window.location.href = "Consent.html";
+    try {
+      await db.collection("applications").add(formObject);
+      window.location.href = "Consent.html";
+    } catch (error) {
+      console.error("Firestore Error:", error);
+      alert("Error saving data. Please try again.");
+    }
   }
 </script>
 
