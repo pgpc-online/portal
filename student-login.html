@@ -28,6 +28,7 @@
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       opacity: 0; animation: fadeIn 1s forwards 0.5s;
+      position: relative;
     }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .card h2 { text-align: center; margin-bottom: 20px; color: var(--primary); }
@@ -43,26 +44,38 @@
       width: 100%; background: var(--primary); color: white;
       border: none; padding: 12px; margin-top: 10px;
       border-radius: 8px; font-size: 16px; cursor: pointer;
+      transition: background 0.3s;
     }
     .card button:hover { background: #303f9f; }
     .card small {
       display: block; margin-top: 15px;
       text-align: center; color: var(--primary); cursor: pointer;
+      user-select: none;
     }
     #errorMsg {
       color: red; margin-top: 10px;
       text-align: center; font-size: 14px;
+      min-height: 20px;
     }
     .toggle-password {
       position: absolute; right: 12px; top: 50%;
       transform: translateY(-50%); cursor: pointer;
       font-size: 18px; color: #777; user-select: none;
+      transition: color 0.3s;
     }
     .toggle-password:hover { color: var(--primary); }
     .password-wrapper { position: relative; }
-    
-      cursor: pointer; background: none; border: none;
-      font-size: 20px; color: var(--primary);
+    .resend-link {
+      display: none;
+      margin-top: 10px;
+      text-align: center;
+      cursor: pointer;
+      color: var(--primary);
+      user-select: none;
+      font-weight: 600;
+    }
+    .resend-link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -73,16 +86,17 @@
     <img src="template/pgpc.png" alt="PGPC" style="width: 50px; height: auto;"/>
 </div>
 
-  <h2 id="formTitle">Login</h2>
-  <form id="authForm">
-    <input type="email" id="email" placeholder="Enter your email" required />
+  <h2 id="formTitle">Student Login</h2>
+  <form id="authForm" autocomplete="off">
+    <input type="email" id="email" placeholder="Enter your email" required autocomplete="username" />
     <div class="password-wrapper">
-      <input type="password" id="password" placeholder="Enter your password" required />
+      <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password" />
       <span class="toggle-password" onclick="togglePassword()">🙉</span>
     </div>
     <button type="submit" id="submitBtn">Login</button>
     <small id="switch">Don't have an account? REGISTER here</small>
     <div id="errorMsg"></div>
+    <div class="resend-link" id="resendVerification">Resend Verification Email</div>
   </form>
 </div>
 
@@ -111,9 +125,12 @@
   const switchLink = document.getElementById("switch");
   const formTitle = document.getElementById("formTitle");
   const submitBtn = document.getElementById("submitBtn");
+  const resendLink = document.getElementById("resendVerification");
 
   let isLogin = true;
+  let lastUserForResend = null;
 
+  // Toggle between login and registration forms
   switchLink.addEventListener("click", () => {
     isLogin = !isLogin;
     formTitle.textContent = isLogin ? "Student Login" : "Student Registration";
@@ -123,6 +140,22 @@
       : "Already have an account? LOGIN here";
     errorMsg.textContent = "";
     errorMsg.style.color = "red";
+    resendLink.style.display = "none";
+    passwordInput.value = "";
+  });
+
+  // Handle resend verification email click
+  resendLink.addEventListener("click", async () => {
+    if (lastUserForResend) {
+      try {
+        await lastUserForResend.sendEmailVerification();
+        errorMsg.style.color = "green";
+        errorMsg.textContent = "Verification email resent. Please check your inbox.";
+      } catch (error) {
+        errorMsg.style.color = "red";
+        errorMsg.textContent = "Failed to resend verification email: " + error.message;
+      }
+    }
   });
 
   form.addEventListener("submit", async (e) => {
@@ -130,16 +163,64 @@
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
 
+    errorMsg.style.color = "red";
+    errorMsg.textContent = "";
+    resendLink.style.display = "none";
+    lastUserForResend = null;
+
     try {
       let userCredential;
 
       if (isLogin) {
+        // Login flow
         userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        if (!user.emailVerified) {
+          errorMsg.style.color = "red";
+          errorMsg.textContent = "Please verify your email before logging in.";
+          resendLink.style.display = "block";
+          lastUserForResend = user;
+          await auth.signOut(); // Sign out user until verification
+          return;
+        }
+
         errorMsg.style.color = "green";
         errorMsg.textContent = "✅ Login successful! Checking form status... ⏳";
+
+        localStorage.setItem("studentEmail", user.email);
+
+        const docRef = db.collection("studentApplications").doc(user.uid);
+        const doc = await docRef.get();
+
+        if (!doc.exists) {
+          errorMsg.textContent = "⚠️ Account found but no form record. Redirecting...";
+          setTimeout(() => {
+            window.location.href = "PGPCform.html";
+          }, 2000);
+          return;
+        }
+
+        const data = doc.data();
+        if (data && data.formSubmitted === true) {
+          errorMsg.textContent = "✅ Form found. Redirecting to portal...";
+          setTimeout(() => {
+            window.location.href = "student-portal.html";
+          }, 2000);
+        } else {
+          errorMsg.textContent = "📝 Form not yet completed. Redirecting to form...";
+          setTimeout(() => {
+            window.location.href = "PGPCform.html";
+          }, 2000);
+        }
+
       } else {
+        // Registration flow
         userCredential = await auth.createUserWithEmailAndPassword(email, password);
         const user = userCredential.user;
+
+        // Send email verification
+        await user.sendEmailVerification();
 
         await db.collection("studentApplications").doc(user.uid).set({
           email: user.email,
@@ -149,40 +230,13 @@
         });
 
         errorMsg.style.color = "green";
-        errorMsg.textContent = "✅ Account created! Redirecting to form...";
-        setTimeout(() => {
-          window.location.href = "PGPCform.html";
-        }, 2000);
-        return;
+        errorMsg.textContent = "✅ Account created! A verification email has been sent. Please verify your email before logging in.";
+        resendLink.style.display = "block";
+        lastUserForResend = user;
+
+        // Clear password field after registration
+        passwordInput.value = "";
       }
-
-      const user = userCredential.user;
-      localStorage.setItem("studentEmail", user.email);
-
-      const docRef = db.collection("studentApplications").doc(user.uid);
-      const doc = await docRef.get();
-
-      if (!doc.exists) {
-        errorMsg.textContent = "⚠️ Account found but no form record. Redirecting...";
-        setTimeout(() => {
-          window.location.href = "PGPCform.html";
-        }, 2000);
-        return;
-      }
-
-      const data = doc.data();
-      if (data && data.formSubmitted === true) {
-        errorMsg.textContent = "✅ Form found. Redirecting to portal...";
-        setTimeout(() => {
-          window.location.href = "student-portal.html";
-        }, 2000);
-      } else {
-        errorMsg.textContent = "📝 Form not yet completed. Redirecting to form...";
-        setTimeout(() => {
-          window.location.href = "PGPCform.html";
-        }, 2000);
-      }
-
     } catch (error) {
       errorMsg.style.color = "red";
       errorMsg.textContent = `❌ ${error.message}`;
@@ -200,9 +254,8 @@
       icon.textContent = "🙉";
     }
   }
-
-  
 </script>
 
 </body>
 </html>
+
