@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
   <title>Student Homepage</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-  <style>
+   <style>
     :root {
       --bg: #f9f9f9;
       --text: #333;
@@ -81,9 +81,10 @@
     .note-card {
       background: var(--card);
       padding: 1rem;
-      border-left: 4px solid #0047AB;
+      border: 4px solid #0047AB;
       margin-bottom: 1rem;
       border-radius: 8px;
+max-width: 250px;
     }
     .modal {
       position: fixed;
@@ -112,7 +113,7 @@
 </head>
 <body>
   <header>
-    <h3>PGPC <span style="font-family: 'Michroma', sans-serif; font-size: 20px;">Student<span></h3>
+    <h3>PGPC <span style="font-family: 'Michroma', sans-serif; font-size: 20px;">Student</span></h3>
     <div>
       <button onclick="toggleDarkMode()">🌓</button>
       <button onclick="logout()"> Logout</button>
@@ -120,23 +121,21 @@
   </header>
 
   <div class="container">
-<h2>Welcome, <span id="studentName">Student</span>!</h2>
+    <h2>Welcome, <span id="studentName">Student</span>!</h2>
     <img id="profilePic" class="profile-pic" src="" alt="Profile Photo" />
     
-
     <div class="info" id="studentInfo">
-<p><strong>Fullname:</strong> <span id="fullName"></span></p>
- <p><strong>Course:</strong> <span id="studentCourse"></span></p>
+      <p><strong>Fullname:</strong> <span id="fullName"></span></p>
+      <p><strong>Course:</strong> <span id="studentCourse"></span></p>
       <p><strong>Email:</strong> <span id="studentEmail"></span></p>
-<p><strong>Contact:</strong> <span id="studentContact"></span></p>
+      <p><strong>Contact:</strong> <span id="studentContact"></span></p>
       <p><strong>Address:</strong> <span id="studentAddress"></span></p>
-      
       <p><strong>Birthday:</strong> <span id="birthDate"></span></p>
       <p><strong>Gender:</strong> <span id="studentSex"></span></p>
     </div>
 
-<button id="viewMoreBtn" onclick="toggleFullInfo()">🔽 View More</button>
-<div id="fullInfo" style="display:none; margin-top: 1rem;"></div>
+    <button id="viewMoreBtn" onclick="toggleFullInfo()">🔽 View More</button>
+    <div id="fullInfo" style="display:none; margin-top: 1rem;"></div>
 
     <div class="notes-section">
       <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -183,19 +182,19 @@
         window.location.href = "index.html";
       });
     }
-function toggleFullInfo() {
-  const section = document.getElementById("fullInfo");
-  const btn = document.getElementById("viewMoreBtn");
 
-  if (section.style.display === "none") {
-    section.style.display = "block";
-    btn.innerHTML = "🔼 View Less";
-  } else {
-    section.style.display = "none";
-    btn.innerHTML = "🔽 View More";
-  }
-}
+    function toggleFullInfo() {
+      const section = document.getElementById("fullInfo");
+      const btn = document.getElementById("viewMoreBtn");
 
+      if (section.style.display === "none") {
+        section.style.display = "block";
+        btn.innerHTML = "🔼 View Less";
+      } else {
+        section.style.display = "none";
+        btn.innerHTML = "🔽 View More";
+      }
+    }
 
     function openNoteModal() {
       document.getElementById("noteModal").style.display = "flex";
@@ -203,6 +202,9 @@ function toggleFullInfo() {
 
     function closeNoteModal() {
       document.getElementById("noteModal").style.display = "none";
+      document.getElementById("noteDate").value = '';
+      document.getElementById("noteTitle").value = '';
+      document.getElementById("noteDescription").value = '';
     }
 
     function saveNote() {
@@ -212,7 +214,7 @@ function toggleFullInfo() {
 
       if (!date || !title || !description) return alert("Please fill out all fields.");
 
-      const user = auth.currentUser;
+      const user = auth.currentUser ;
       if (!user) return alert("Not authenticated.");
 
       db.collection("studentApplications")
@@ -244,6 +246,10 @@ function toggleFullInfo() {
             card.innerHTML = `<strong>${note.title}</strong><br><small>${note.date}</small><p>${note.description}</p>`;
             notesList.appendChild(card);
           });
+        })
+        .catch(err => {
+          notesList.innerHTML = "Error loading notes.";
+          console.error("Error loading notes:", err);
         });
     }
 
@@ -267,32 +273,24 @@ function toggleFullInfo() {
         document.getElementById("studentEmail").textContent = user.email || "N/A";
         document.getElementById("studentAddress").textContent = data.studentAddress || "N/A";
         document.getElementById("studentContact").textContent = data.studentNumber || "N/A";
+        document.getElementById("birthDate").textContent = data.birthDate || "N/A"; // Added missing field
+        document.getElementById("studentSex").textContent = data.studentSex || "N/A"; // Added missing field
 
-        document.getElementById("isGarciano").textContent = data.isGarciano === "yes" ? "Yes" : "No";
+        let fullDetailsHTML = `
+          <p><strong>Civil Status:</strong> ${data.civilStatus || 'N/A'}</p>
+          <p><strong>Religion:</strong> ${data.studentReligion || 'N/A'}</p>
+          <p><strong>Citizenship:</strong> ${data.studentCitizenship || 'N/A'}</p>
+          <p><strong>Father:</strong> ${data.fatherName || 'N/A'}</p>
+          <p><strong>Father's Contact:</strong> ${data.fatherNumber || 'N/A'}</p>
+          <p><strong>Mother:</strong> ${data.motherName || 'N/A'}</p>
+          <p><strong>Mother's Contact:</strong> ${data.motherNumber || 'N/A'}</p>
+          <p><strong>Guardian Name:</strong> ${data.guardianName || 'N/A'}</p>
+          <p><strong>Guardian Contact:</strong> ${data.guardianNumber || 'N/A'}</p>
+          <p><strong>Family Income:</strong> ${data.familyIncome || 'N/A'}</p>
+          <p><strong>Garciano:</strong> ${data.isGarciano || 'N/A'}</p>
+        `;
 
-        if (data.submittedAt) {
-          const date = new Date(data.submittedAt);
-          document.getElementById("submittedDate").textContent = date.toLocaleDateString() + " " + date.toLocaleTimeString();
-        } else {
-          document.getElementById("submittedDate").textContent = "N/A";
-        }
-
-let fullDetailsHTML = `
-  <p><strong>Civil Status:</strong> ${data.civilStatus || 'N/A'}</p>
-  <p><strong>Religion:</strong> ${data.studentReligion || 'N/A'}</p>
-  <p><strong>Citizenship:</strong> ${data.studentCitizenship || 'N/A'}</p>
-  <p><strong>Father:</strong> ${data.fatherName || 'N/A'}</p>
-  <p><strong>Father's Contact:</strong> ${data.fatherNumber || 'N/A'}</p>
-  <p><strong>Mother:</strong> ${data.motherName || 'N/A'}</p>
-<p><strong>Mother's Contact:</strong> ${data.motherNumber || 'N/A'}</p>
-  <p><strong>Guardian Name:</strong> ${data.guardianName || 'N/A'}</p>
-  <p><strong>Guardian Contact:</strong> ${data.guardianNumber || 'N/A'}</p>
-  <p><strong>Family Income:</strong> ${data.familyIncome || 'N/A'}</p>
-  <p><strong>Garciano:</strong> ${data.isGarciano || 'N/A'}</p>
-`;
-
-document.getElementById("fullInfo").innerHTML = fullDetailsHTML;
-
+        document.getElementById("fullInfo").innerHTML = fullDetailsHTML;
 
         loadNotes(uid);
 
