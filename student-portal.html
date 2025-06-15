@@ -109,6 +109,32 @@ max-width: 150px;
       border-radius: 6px;
       border: 1px solid #ccc;
     }
+#fullInfo {
+  font-size: 1rem; /* Base font size */
+}
+
+#fullInfo p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 600px) {
+  #fullInfo {
+    font-size: 0.9rem; /* Smaller font size for smaller screens */
+  }
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+  #fullInfo {
+    font-size: 1.1rem; /* Slightly larger font size for medium screens */
+  }
+}
+
+@media (min-width: 901px) {
+  #fullInfo {
+    font-size: 1.2rem; /* Larger font size for larger screens */
+  }
+}
+
   </style>
 </head>
 <body>
