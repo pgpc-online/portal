@@ -176,14 +176,14 @@
         userCredential = await auth.signInWithEmailAndPassword(email, password);
         const user = userCredential.user;
 
-        if (!user.emailVerified) {
-          errorMsg.style.color = "red";
-          errorMsg.textContent = "Please verify your email before logging in.";
-          resendLink.style.display = "block";
-          lastUserForResend = user;
-          await auth.signOut(); // Sign out user until verification
-          return;
-        }
+        // if (!user.emailVerified) {
+//   errorMsg.style.color = "red";
+//   errorMsg.textContent = "Please verify your email before logging in.";
+//   resendLink.style.display = "block";
+//   lastUserForResend = user;
+//   await auth.signOut();
+//   return;
+// }
 
         errorMsg.style.color = "green";
         errorMsg.textContent = "✅ Login successful! Checking form status... ⏳";
