@@ -220,7 +220,7 @@
         const user = userCredential.user;
 
         // Send email verification
-        await user.sendEmailVerification();
+        // await user.sendEmailVerification();
 
         await db.collection("studentApplications").doc(user.uid).set({
           email: user.email,
