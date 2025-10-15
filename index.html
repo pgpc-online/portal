@@ -6,8 +6,11 @@
   <title>PGPC Online Admission System</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    /* Reset and base */
-    *, *::before, *::after {
+    
+    *, *::before {
+      box-sizing: border-box;
+    }
+    *::after{
       box-sizing: border-box;
     }
     body {
@@ -17,8 +20,7 @@
       color: #6b7280;
       font-size: 18px;
       line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+      
       scroll-behavior: smooth;
     }
     a {
@@ -31,7 +33,7 @@
       outline: 3px solid #2563eb;
     }
 
-    /* Sticky Navigation Bar */
+    /* Nav Bar */
     header {
       position: sticky;
       top: 0;
@@ -76,8 +78,8 @@
     }
 
     /* Navigation links container 
-       Desktop: horizontal flex
-       Mobile: vertical drawer hidden by default */
+        for desktop: horizontal flex
+       for mobile: vertical drawer hidden by default */
     .nav-contents {
       display: flex;
       gap: 1.5rem;
@@ -126,7 +128,7 @@
       background-color: #ad8d13;
     }
 
-    /* Menu toggle for mobile */
+    /* menu mobile devices */
     .menu-toggle {
       display: none;
       background: none;
@@ -617,7 +619,7 @@
 </section>
 
 <main>
-
+<!--About us-->
 <section class="section" id="about" tabindex="-1" aria-labelledby="about-title">
   
   <h2 id="about-title">About PGPC</h2>
@@ -626,7 +628,8 @@
   </p>
   <button class="read" onclick="location.href='about.html'">Read More</button>
 </section>
-
+  
+<!--courses offered-->
 <section class="section" id="courses" tabindex="-1" aria-labelledby="courses-title">
   
   <h2 id="courses-title">Courses Offered</h2>
@@ -679,9 +682,10 @@
     <h2 class="haha">News </h2>
     <iframe id="hi" src="https://widgets.sociablekit.com/facebook-page-posts/iframe/25565889" frameborder="0" width="100%" height="900"></iframe>
  
-
+<!--kontak us-->
 <section class="section" id="contact" tabindex="-1" aria-labelledby="contact-title">
-  
+
+<!--mapa ng encantdia -->
 <iframe 
   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.472305226647!2d121.26432607510538!3d13.88280938726921!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd3f0024d47b1b%3A0x111daf1b2a29e55e!2sPadre%20Garcia%20Polytechnic%20College!5e0!3m2!1sen!2sph!4v1717995672387!5m2!1sen!2sph" 
   width="100%" 
@@ -699,6 +703,7 @@
   <img src="fbb.png" alt="FB" aria-hidden="true"/></a>
    <a href="mailto: padregarciapolytechniccollege@gmail.com"><img src="mm.png" style="margin-left: 90px"></a>
   </div>
+  
 <footer>
   <h4>"TAGA PGPC AKO: MATALINO, DISIPLINADO, MABUTING TAO, IPINAGMAMALAKI KO"</h4>
   <p>&copy; 2025 Padre Garcia Polytechnic College | <a href="#" tabindex="0">Privacy Policy</a> | <a href="#" tabindex="0">Terms of Service</a></p>
