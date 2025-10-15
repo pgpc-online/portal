@@ -65,26 +65,14 @@
     }
     .toggle-password:hover { color: var(--primary); }
     .password-wrapper { position: relative; }
-    .resend-link {
-      display: none;
-      margin-top: 10px;
-      text-align: center;
-      cursor: pointer;
-      color: var(--primary);
-      user-select: none;
-      font-weight: 600;
-    }
-    .resend-link:hover {
-      text-decoration: underline;
-    }
   </style>
 </head>
 <body>
 
 <div class="card">
-<div style="text-align: center; margin-bottom: 20px;">
+  <div style="text-align: center; margin-bottom: 20px;">
     <img src="template/pgpc.png" alt="PGPC" style="width: 50px; height: auto;"/>
-</div>
+  </div>
 
   <h2 id="formTitle">Student Login</h2>
   <form id="authForm" autocomplete="off">
@@ -96,7 +84,6 @@
     <button type="submit" id="submitBtn">Login</button>
     <small id="switch">Don't have an account? REGISTER here</small>
     <div id="errorMsg"></div>
-    <div class="resend-link" id="resendVerification">Resend Verification Email</div>
   </form>
 </div>
 
@@ -115,7 +102,6 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // Set session persistence
   auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
   const form = document.getElementById("authForm");
@@ -125,12 +111,9 @@
   const switchLink = document.getElementById("switch");
   const formTitle = document.getElementById("formTitle");
   const submitBtn = document.getElementById("submitBtn");
-  const resendLink = document.getElementById("resendVerification");
 
   let isLogin = true;
-  let lastUserForResend = null;
 
-  // Toggle between login and registration forms
   switchLink.addEventListener("click", () => {
     isLogin = !isLogin;
     formTitle.textContent = isLogin ? "Student Login" : "Student Registration";
@@ -140,22 +123,7 @@
       : "Already have an account? LOGIN here";
     errorMsg.textContent = "";
     errorMsg.style.color = "red";
-    resendLink.style.display = "none";
     passwordInput.value = "";
-  });
-
-  // Handle resend verification email click
-  resendLink.addEventListener("click", async () => {
-    if (lastUserForResend) {
-      try {
-        await lastUserForResend.sendEmailVerification();
-        errorMsg.style.color = "green";
-        errorMsg.textContent = "Verification email resent. Please check your inbox.";
-      } catch (error) {
-        errorMsg.style.color = "red";
-        errorMsg.textContent = "Failed to resend verification email: " + error.message;
-      }
-    }
   });
 
   form.addEventListener("submit", async (e) => {
@@ -165,25 +133,14 @@
 
     errorMsg.style.color = "red";
     errorMsg.textContent = "";
-    resendLink.style.display = "none";
-    lastUserForResend = null;
 
     try {
       let userCredential;
 
       if (isLogin) {
-        // Login flow
+        // LOGIN
         userCredential = await auth.signInWithEmailAndPassword(email, password);
         const user = userCredential.user;
-
-        // if (!user.emailVerified) {
-//   errorMsg.style.color = "red";
-//   errorMsg.textContent = "Please verify your email before logging in.";
-//   resendLink.style.display = "block";
-//   lastUserForResend = user;
-//   await auth.signOut();
-//   return;
-// }
 
         errorMsg.style.color = "green";
         errorMsg.textContent = "✅ Login successful! Checking form status... ⏳";
@@ -215,12 +172,9 @@
         }
 
       } else {
-        // Registration flow
+        // REGISTRATION
         userCredential = await auth.createUserWithEmailAndPassword(email, password);
         const user = userCredential.user;
-
-        // Send email verification
-        // await user.sendEmailVerification();
 
         await db.collection("studentApplications").doc(user.uid).set({
           email: user.email,
@@ -230,11 +184,7 @@
         });
 
         errorMsg.style.color = "green";
-        errorMsg.textContent = "✅ Account created! A verification email has been sent. Please verify your email before logging in.";
-        resendLink.style.display = "block";
-        lastUserForResend = user;
-
-        // Clear password field after registration
+        errorMsg.textContent = "✅ Account created successfully! You can now log in.";
         passwordInput.value = "";
       }
     } catch (error) {
@@ -258,4 +208,3 @@
 
 </body>
 </html>
-
